@@ -1,0 +1,222 @@
+<!doctype html>
+<!--
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  Copyright (C) 2026 Emanuel Barbera
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A lightweight, private, browser-based calendar for planning activities, deliverables, and shifts.">
+    <meta name="theme-color" content="#0f766e">
+    <title>Dynamic Calendar</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <!-- Project settings and calendar controls. -->
+      <section class="controls" aria-labelledby="page-title">
+        <header class="masthead">
+          <div>
+            <p class="eyebrow" data-i18n="eyebrow">Project planner</p>
+            <h1 id="page-title" data-i18n="headline">Dynamic calendar</h1>
+            <p class="intro" data-i18n="intro">
+              Organize activities, deliverables, and shifts for a specific period. Notes are saved automatically in this browser.
+            </p>
+          </div>
+          <span class="status" id="saveStatus" role="status" aria-live="polite">Ready</span>
+        </header>
+
+        <form id="calendarForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="projectName" data-i18n="project">Project or calendar name</label>
+              <input
+                id="projectName"
+                maxlength="80"
+                placeholder="E.g. Campaign launch"
+                data-i18n-placeholder="projectPlaceholder"
+                autocomplete="off"
+              >
+            </div>
+
+            <!-- Custom date-range picker. Hidden native values remain the source of truth. -->
+            <div class="field travel-field" id="travelDateField">
+              <div class="travel-field-header">
+                <label id="travelDateMainLabel" for="travelTriggerBtn" data-i18n="period">Date range</label>
+                <span class="travel-duration-badge" id="travelDurationBadge">28 days</span>
+              </div>
+
+              <div class="travel-picker-widget">
+                <button
+                  type="button"
+                  class="travel-trigger-btn"
+                  id="travelTriggerBtn"
+                  aria-haspopup="dialog"
+                  aria-expanded="false"
+                >
+                  <span class="travel-slot" id="slotStart" data-target="start">
+                    <span class="calendar-icon" aria-hidden="true"></span>
+                    <span class="slot-tag" id="labelStartDate" data-i18n="from">From</span>
+                    <span class="slot-date-text" id="displayStartDate">—</span>
+                  </span>
+                  <span class="travel-arrow-wrap" aria-hidden="true">→</span>
+                  <span class="travel-slot" id="slotEnd" data-target="end">
+                    <span class="calendar-icon" aria-hidden="true"></span>
+                    <span class="slot-tag" id="labelEndDate" data-i18n="to">To</span>
+                    <span class="slot-date-text" id="displayEndDate">—</span>
+                  </span>
+                </button>
+
+                <input type="hidden" id="startDate" name="startDate">
+                <input type="hidden" id="endDate" name="endDate">
+
+                <div
+                  class="travel-popover"
+                  id="travelPopover"
+                  role="dialog"
+                  aria-labelledby="datePickerTitle"
+                  hidden
+                >
+                  <h2 class="visually-hidden" id="datePickerTitle" data-i18n="selectDateRange">Select a date range</h2>
+
+                  <div class="popover-header">
+                    <div class="popover-tabs">
+                      <button type="button" class="popover-tab active" id="tabStart" data-target="start">
+                        <span class="popover-tab-label" data-i18n="start">Start date</span>
+                        <span class="popover-tab-value" id="tabValStart">—</span>
+                        <span class="popover-tab-subtitle" id="tabSubStart">—</span>
+                      </button>
+                      <span class="travel-arrow-wrap" aria-hidden="true">→</span>
+                      <button type="button" class="popover-tab" id="tabEnd" data-target="end">
+                        <span class="popover-tab-label" data-i18n="end">End date</span>
+                        <span class="popover-tab-value" id="tabValEnd">—</span>
+                        <span class="popover-tab-subtitle" id="tabSubEnd">—</span>
+                      </button>
+                    </div>
+
+                    <div class="popover-presets" id="popoverPresets" aria-label="Date range presets">
+                      <button type="button" class="preset-pill" data-days="7" data-i18n="sevenDays">7 days</button>
+                      <button type="button" class="preset-pill" data-days="14" data-i18n="twoWeeks">2 weeks</button>
+                      <button type="button" class="preset-pill" data-days="28" data-i18n="fourWeeks">4 weeks</button>
+                      <button type="button" class="preset-pill" data-preset="thisMonth" data-i18n="thisMonth">This month</button>
+                      <button type="button" class="preset-pill" data-preset="nextMonth" data-i18n="nextMonth">Next month</button>
+                    </div>
+                  </div>
+
+                  <div class="popover-nav">
+                    <button type="button" class="popover-nav-btn" id="travelPrevMonth" data-i18n-aria-label="previousMonth">‹</button>
+                    <span class="travel-duration-badge" id="popoverNavBadge">Start date</span>
+                    <button type="button" class="popover-nav-btn" id="travelNextMonth" data-i18n-aria-label="nextMonthLabel">›</button>
+                  </div>
+
+                  <div class="popover-calendars" id="popoverCalendars"></div>
+
+                  <div class="popover-footer">
+                    <p class="popover-footer-summary">
+                      <strong id="footerDaysText">28 days</strong>
+                      <span id="footerDatesText">—</span>
+                    </p>
+                    <div class="popover-footer-actions">
+                      <button type="button" class="button ghost" id="travelTodayBtn" data-i18n="today">Today</button>
+                      <button type="button" class="button primary" id="travelApplyBtn" data-i18n="apply">Done</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="weekStart" data-i18n="week">Week starts on</label>
+              <select id="weekStart">
+                <option value="1" data-i18n="monday">Monday</option>
+                <option value="0" data-i18n="sunday">Sunday</option>
+                <option value="first" data-i18n="first">From the first day</option>
+              </select>
+            </div>
+
+            <div class="field language-field">
+              <label for="language" data-i18n="language">Language</label>
+              <select id="language">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="it">Italiano</option>
+                <option value="pt">Português</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Generated calendar and its non-destructive/destructive actions. -->
+      <section class="calendar-wrapper" aria-labelledby="calendarTitle">
+        <header class="calendar-top">
+          <div>
+            <h2 id="calendarTitle" class="calendar-title">Activity calendar</h2>
+            <p id="calendarRange" class="calendar-range"></p>
+          </div>
+
+          <div class="calendar-actions" aria-label="Calendar actions">
+            <button class="button ghost" type="button" id="printButton" data-i18n="print">Print / save PDF</button>
+            <button class="button ghost" type="button" id="clearColorsButton" data-i18n="removeColors">Remove colors</button>
+            <button class="button danger" type="button" id="clearButton" data-i18n="clearNotes">Clear visible notes</button>
+            <button class="button danger" type="button" id="cleanAllButton" data-i18n="cleanAll">Clear all</button>
+          </div>
+        </header>
+
+        <div class="legend" aria-label="Calendar legend">
+          <span><i></i><span data-i18n="period">Period</span></span>
+          <span><i class="weekend-dot"></i><span data-i18n="weekend">Weekend</span></span>
+          <span><i class="outside-dot"></i><span data-i18n="outside">Outside period</span></span>
+        </div>
+
+        <p class="hint" id="calendarHint" data-i18n="hint">
+          Tip: write directly inside a day. Right-click or drag across day headers to add color.
+        </p>
+
+        <div id="calendar" class="calendar"></div>
+      </section>
+    </main>
+
+    <!-- Keep this legal notice visible in modified network-hosted versions. -->
+    <footer class="legal-notice" lang="en">
+      <p>
+        Copyright © 2026 Emanuel Barbera. This is free software: you may
+        redistribute and modify it under the GNU AGPL v3 or later. It is
+        provided without warranty.
+      </p>
+      <nav aria-label="Legal and source information">
+        <a href="LICENSE">License</a>
+        <a href="NOTICE.md">Attribution</a>
+        <a href="https://github.com/emanuelbarbera/dynamic-calendar-activities">Source code</a>
+      </nav>
+    </footer>
+
+    <!-- Context menu used to color one or more selected calendar cells. -->
+    <aside id="colorMenu" class="color-menu" aria-labelledby="colorMenuTitle" hidden>
+      <h2 id="colorMenuTitle">Apply color</h2>
+      <div class="field">
+        <label for="menuColor" data-i18n="color">Color</label>
+        <input type="color" id="menuColor" value="#dbeafe">
+      </div>
+      <div class="field">
+        <label for="menuScope" data-i18n="applyTo">Apply to</label>
+        <select id="menuScope">
+          <option value="selection" data-i18n="selection">Selection</option>
+          <option value="week" data-i18n="row">Entire row</option>
+          <option value="column" data-i18n="column">Entire column</option>
+        </select>
+      </div>
+      <div class="menu-actions">
+        <button class="button primary" type="button" id="applyMenuColor" data-i18n="apply">Done</button>
+        <button class="button ghost" type="button" id="closeColorMenu" data-i18n="cancel">Cancel</button>
+      </div>
+    </aside>
+
+    <noscript>
+      <p class="noscript-message">This application requires JavaScript to generate and save the calendar.</p>
+    </noscript>
+
+    <script type="module" src="assets/js/app.js"></script>
+  </body>
+</html>

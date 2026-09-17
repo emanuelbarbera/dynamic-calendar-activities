@@ -1,0 +1,31 @@
+{
+  "name": "dynamic-calendar-activities",
+  "version": "1.0.0",
+  "description": "A lightweight, private, browser-based activity calendar.",
+  "author": "Emanuel Barbera",
+  "type": "module",
+  "scripts": {
+    "check": "node --check assets/js/app.js && node --check assets/js/calendar-view.js && node --check assets/js/date-range-picker.js && node --check assets/js/date-utils.js && node --check assets/js/i18n.js && node --check assets/js/share.js && node --check assets/js/storage.js",
+    "test": "node tests/date-utils.test.js"
+  },
+  "keywords": [
+    "calendar",
+    "planner",
+    "vanilla-javascript",
+    "offline-first",
+    "static-site"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "private": false,
+  "homepage": "https://emanuelbarbera.github.io/dynamic-calendar-activities/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emanuelbarbera/dynamic-calendar-activities.git"
+  },
+  "bugs": {
+    "url": "https://github.com/emanuelbarbera/dynamic-calendar-activities/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

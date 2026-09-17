@@ -1,0 +1,73 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Copyright (C) 2026 Emanuel Barbera
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Allow one Pages deployment at a time without cancelling an active release.
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+# Start with no token access; each job receives only what it needs.
+permissions: {}
+
+jobs:
+  build:
+    name: Validate and package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Check JavaScript syntax
+        run: npm run check
+
+      # Publish only runtime files. Repository documentation and tests are not
+      # needed in the Pages artifact.
+      - name: Prepare the static site
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -R assets _site/
+          cp LICENSE NOTICE.md _site/
+          touch _site/.nojekyll
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
