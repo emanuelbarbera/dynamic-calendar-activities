@@ -9,11 +9,19 @@
  */
 
 /** Keep visual metadata beside the control instead of coupling it to i18n. */
-const LANGUAGE_OPTIONS = Object.freeze({
+export const LANGUAGE_OPTIONS = Object.freeze({
   en: { flag: "gb", name: "English" },
   es: { flag: "es", name: "Español" },
   it: { flag: "it", name: "Italiano" },
   pt: { flag: "pt", name: "Português" },
+  fr: { flag: "fr", name: "Français" },
+  de: { flag: "de", name: "Deutsch" },
+  zh: { flag: "cn", name: "简体中文" },
+  ja: { flag: "jp", name: "日本語" },
+  ko: { flag: "kr", name: "한국어" },
+  ar: { flag: "sa", name: "العربية" },
+  hi: { flag: "in", name: "हिन्दी" },
+  ru: { flag: "ru", name: "Русский" },
 });
 
 export class LanguagePicker {

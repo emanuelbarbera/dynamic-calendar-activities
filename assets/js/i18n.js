@@ -9,7 +9,24 @@
  * code in `SUPPORTED_LANGUAGES`.
  */
 
-export const SUPPORTED_LANGUAGES = ["en", "es", "it", "pt"];
+import { additionalTranslations } from "./locales/additional.js";
+
+export const SUPPORTED_LANGUAGES = [
+  "en",
+  "es",
+  "it",
+  "pt",
+  "fr",
+  "de",
+  "zh",
+  "ja",
+  "ko",
+  "ar",
+  "hi",
+  "ru",
+];
+
+const RTL_LANGUAGES = new Set(["ar"]);
 
 export const translations = {
   en: {
@@ -264,6 +281,7 @@ export const translations = {
     hint: "Dica: escreva dentro de um dia. Clique com o botão direito ou arraste nos cabeçalhos para adicionar cor.",
     activitiesFor: "Atividades de",
   },
+  ...additionalTranslations,
 };
 
 /** Return a supported language code, falling back to English. */
@@ -276,13 +294,20 @@ export function getMessages(language) {
   return translations[normalizeLanguage(language)];
 }
 
+/** Return the writing direction required by a supported language. */
+export function getTextDirection(language) {
+  return RTL_LANGUAGES.has(normalizeLanguage(language)) ? "rtl" : "ltr";
+}
+
 /**
  * Apply simple text, placeholder, and accessible-label translations declared
  * in the HTML. Dynamic calendar content is translated while it is rendered.
  */
 export function translateDocument(language) {
-  const messages = getMessages(language);
-  document.documentElement.lang = normalizeLanguage(language);
+  const normalizedLanguage = normalizeLanguage(language);
+  const messages = getMessages(normalizedLanguage);
+  document.documentElement.lang = normalizedLanguage;
+  document.documentElement.dir = getTextDirection(normalizedLanguage);
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const value = messages[element.dataset.i18n];

@@ -16,7 +16,12 @@ import {
   startOfCalendarWeek,
   toDateKey,
 } from "../assets/js/date-utils.js";
-import { SUPPORTED_LANGUAGES, translations } from "../assets/js/i18n.js";
+import {
+  getTextDirection,
+  SUPPORTED_LANGUAGES,
+  translations,
+} from "../assets/js/i18n.js";
+import { LANGUAGE_OPTIONS } from "../assets/js/language-picker.js";
 
 test("parseDate creates a local date without UTC drift", () => {
   const date = parseDate("2026-09-17");
@@ -60,5 +65,17 @@ test("every supported language implements the complete translation contract", ()
   const englishKeys = Object.keys(translations.en).sort();
   SUPPORTED_LANGUAGES.forEach((language) => {
     assert.deepEqual(Object.keys(translations[language]).sort(), englishKeys);
+    assert.equal(translations[language].months.length, 12);
+    assert.equal(translations[language].weekdays.length, 7);
   });
+});
+
+test("language metadata and translation catalogs stay synchronized", () => {
+  assert.deepEqual(Object.keys(LANGUAGE_OPTIONS), SUPPORTED_LANGUAGES);
+});
+
+test("Arabic uses right-to-left layout without affecting other languages", () => {
+  assert.equal(getTextDirection("ar"), "rtl");
+  assert.equal(getTextDirection("en"), "ltr");
+  assert.equal(getTextDirection("unsupported"), "ltr");
 });

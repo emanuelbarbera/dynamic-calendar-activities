@@ -209,7 +209,7 @@ h1 {
   border-radius: 10px;
   color: var(--color-ink);
   background: #ffffff;
-  text-align: left;
+  text-align: start;
   transition: border-color 150ms, box-shadow 150ms;
 }
 
@@ -249,11 +249,13 @@ h1 {
   top: calc(100% + 7px);
   right: 0;
   left: 0;
+  max-height: min(360px, 60vh);
   padding: 6px;
   border: 1px solid #cbd5e1;
   border-radius: 11px;
   background: #ffffff;
   box-shadow: 0 14px 30px rgb(15 23 42 / 16%);
+  overflow-y: auto;
 }
 
 .language-menu[hidden] {
@@ -270,7 +272,7 @@ h1 {
   border-radius: 7px;
   color: var(--color-ink);
   background: transparent;
-  text-align: left;
+  text-align: start;
 }
 
 .language-menu button:hover,
@@ -278,6 +280,10 @@ h1 {
 .language-menu button[aria-checked="true"] {
   outline: 0;
   background: var(--color-brand-soft);
+}
+
+html[dir="rtl"] .travel-arrow-wrap {
+  transform: scaleX(-1);
 }
 
 .language-menu button[aria-checked="true"] {

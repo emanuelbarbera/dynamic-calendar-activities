@@ -2,6 +2,8 @@
 
 A lightweight, private, browser-based planner for activities, deliverables, and shifts. Choose any date range, write directly into each day, add color, share the current view through its URL, and print a clean landscape calendar.
 
+[Open the live demo](https://calendar.emanuelbarbera.it/)
+
 The application is intentionally built with semantic HTML, modern CSS, and vanilla JavaScript. It has no framework, production dependencies, database, account system, analytics, or backend. It is free software released under the GNU Affero General Public License v3 or later.
 
 ## Why this project exists
@@ -21,7 +23,8 @@ Many planning tools are excellent but unnecessarily heavy for a short-lived proj
 - Monday, Sunday, or exact-start week layouts.
 - Editable daily notes with automatic local saving.
 - Color applied to a selection, a full week row, or a weekday column.
-- English, Spanish, Italian, and Portuguese interfaces.
+- English, Spanish, Italian, Portuguese, French, German, Simplified Chinese, Japanese, Korean, Arabic, Hindi, and Russian interfaces.
+- Automatic right-to-left layout for Arabic.
 - Flag-assisted language menu with text fallbacks and keyboard navigation.
 - Shareable URLs containing the visible calendar state.
 - Responsive layout and reduced-motion support.
@@ -88,6 +91,8 @@ Very large calendars or long notes create longer URLs. Browser and messaging-pla
 │       ├── date-utils.js         # Pure local-date helpers
 │       ├── i18n.js               # Translations and DOM localization
 │       ├── language-picker.js    # Accessible flag-assisted language menu
+│       ├── locales/
+│       │   └── additional.js     # Additional complete translation catalogs
 │       ├── share.js              # Validated URL serialization
 │       └── storage.js            # localStorage adapter and key ownership
 ├── tests/
@@ -113,6 +118,7 @@ The project uses native browser ES modules. Each module has a narrow responsibil
 - `date-utils.js` contains pure date operations that can be tested without a browser.
 - `i18n.js` contains the language dictionaries and the small translation layer.
 - `language-picker.js` manages the accessible language menu and its visual flag state.
+- `locales/additional.js` keeps the expanded translation catalog reviewable without adding runtime requests.
 
 This separation keeps the application easy to review without introducing a framework, bundler, package download, or runtime service.
 
@@ -170,12 +176,13 @@ Preserve SPDX headers, copyright notices, the in-app source link, `NOTICE.md`, a
 
 ## Adding a language
 
-1. Copy the English dictionary in `assets/js/i18n.js`.
+1. Copy the English dictionary into `assets/js/locales/additional.js`.
 2. Translate every user-facing value while keeping the keys unchanged.
-3. Add the language code to `SUPPORTED_LANGUAGES`.
-4. Add the language metadata to `LANGUAGE_OPTIONS` in `language-picker.js`.
+3. Add the language code to `SUPPORTED_LANGUAGES` and to `RTL_LANGUAGES` when required.
+4. Add the native language name and representative flag to `LANGUAGE_OPTIONS` in `language-picker.js`.
 5. Add a matching menu button to `#languageMenu` in `index.html`.
-6. Exercise the date picker, action buttons, confirmations, placeholders, and print view.
+6. Run `npm test` to verify the translation contract and selector metadata.
+7. Exercise the date picker, action buttons, confirmations, placeholders, and print view.
 
 Keep language names in their native form (for example, `Italiano`) so users can recognize them regardless of the current interface language.
 
@@ -266,6 +273,7 @@ Performance work should be driven by measurements. For typical project ranges, d
 
 ## Project links
 
+- [Live demo](https://calendar.emanuelbarbera.it/)
 - [GitHub repository](https://github.com/emanuelbarbera/dynamic-calendar-activities)
 - [Issue tracker](https://github.com/emanuelbarbera/dynamic-calendar-activities/issues)
 - [Contribution guide](CONTRIBUTING.md)
