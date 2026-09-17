@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pages: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v6
@@ -50,6 +51,8 @@ jobs:
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload the Pages artifact
         uses: actions/upload-pages-artifact@v4
