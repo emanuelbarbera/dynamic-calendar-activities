@@ -79,6 +79,7 @@ Then verify the behavior relevant to your change. For broad UI work, cover:
 - Language switching.
 - Mobile layout around 390 CSS pixels wide.
 - Print preview in A4 landscape.
+- Multi-month printing without splitting a month label from its week rows.
 - Keyboard focus visibility and `Escape` behavior.
 
 ## Pull request expectations

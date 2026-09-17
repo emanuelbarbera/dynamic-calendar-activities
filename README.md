@@ -29,6 +29,7 @@ Many planning tools are excellent but unnecessarily heavy for a short-lived proj
 - Shareable URLs containing the visible calendar state.
 - Responsive layout and reduced-motion support.
 - A4 landscape print and PDF styling.
+- Month groups remain intact across printed pages whenever they fit on one page.
 - No backend, analytics, remote fonts, or runtime application services.
 - No production install or build step.
 

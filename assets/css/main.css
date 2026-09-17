@@ -1223,6 +1223,19 @@ html[dir="rtl"] .travel-arrow-wrap {
   .calendar {
     border-color: var(--color-line);
     border-radius: 0;
+    overflow: visible;
+  }
+
+  /*
+   * Keep the vertical month label and all of its week rows in one printable
+   * fragment. Without this rule, browsers may move individual rows to the
+   * next page while splitting or detaching the month indicator on the left.
+   */
+  .calendar-month-group,
+  .month-indicator,
+  .month-weeks {
+    page-break-inside: avoid;
+    break-inside: avoid-page;
   }
 
   .weekday {
