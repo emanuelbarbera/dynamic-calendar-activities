@@ -106,3 +106,14 @@ export function updateShareUrl({ settings, language, snapshot }) {
     // remains fully usable even when its URL cannot be refreshed.
   }
 }
+
+/** Remove every query parameter while preserving the current path and hash. */
+export function clearShareUrl() {
+  try {
+    const url = new URL(window.location.href);
+    url.search = "";
+    window.history.replaceState(null, "", url);
+  } catch {
+    // History updates may be unavailable under file:// or strict policies.
+  }
+}

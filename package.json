@@ -5,8 +5,8 @@
   "author": "Emanuel Barbera",
   "type": "module",
   "scripts": {
-    "check": "node --check assets/js/app.js && node --check assets/js/calendar-view.js && node --check assets/js/date-range-picker.js && node --check assets/js/date-utils.js && node --check assets/js/i18n.js && node --check assets/js/share.js && node --check assets/js/storage.js",
-    "test": "node tests/date-utils.test.js"
+    "check": "node --check assets/js/app.js && node --check assets/js/calendar-view.js && node --check assets/js/date-range-picker.js && node --check assets/js/date-utils.js && node --check assets/js/i18n.js && node --check assets/js/language-picker.js && node --check assets/js/share.js && node --check assets/js/storage.js",
+    "test": "node tests/date-utils.test.js && node tests/share.test.js"
   },
   "keywords": [
     "calendar",

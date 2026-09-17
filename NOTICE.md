@@ -15,4 +15,6 @@ Modified versions must identify their changes as required by the license. Networ
 
 ## Third-party material
 
-The project currently contains no bundled third-party runtime libraries or assets. Contributors must document any third-party material and its compatible license here before inclusion.
+The interface loads [flag-icons](https://github.com/lipis/flag-icons) version 7.5.0 from jsDelivr to display country flags in the language picker. flag-icons is copyright Panayiotis Lipiridis and contributors and is available under the MIT License. The assets are referenced remotely and are not bundled in this repository.
+
+The language picker remains fully usable when the CDN resource is unavailable. Contributors must document any additional third-party material and its compatible license here before inclusion.

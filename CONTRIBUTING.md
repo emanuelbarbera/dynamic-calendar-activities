@@ -75,6 +75,7 @@ Then verify the behavior relevant to your change. For broad UI work, cover:
 - Note persistence after reload.
 - Color selection, row color, and column color.
 - URL restoration in a fresh tab.
+- No query parameters on an untouched initial load, and complete URL cleanup after **Clear all**.
 - Language switching.
 - Mobile layout around 390 CSS pixels wide.
 - Print preview in A4 landscape.
@@ -96,7 +97,7 @@ Reviewers may ask for a smaller change, clearer naming, a regression test, or an
 
 This project is licensed under `AGPL-3.0-or-later`. By submitting a contribution, you confirm that you have the right to provide it and agree that it will be licensed under the same terms without an additional contributor agreement.
 
-Do not remove or weaken SPDX identifiers, copyright notices, modification notices, the in-app legal notice, source-code access, `NOTICE.md`, or the complete `LICENSE` text. Operators of modified network versions must update the in-app **Source code** link so it provides the corresponding source for the version users are running. New third-party material must have a compatible license and must be documented in `NOTICE.md` before inclusion.
+Do not remove or weaken SPDX identifiers, copyright notices, modification notices, the in-app legal notice, source-code access, `NOTICE.md`, or the complete `LICENSE` text. Operators of modified network versions must update the in-app **GitHub repository** link so it provides the corresponding source for the version users are running. New third-party material must have a compatible license and must be documented in `NOTICE.md` before inclusion.
 
 ## Reporting security problems
 

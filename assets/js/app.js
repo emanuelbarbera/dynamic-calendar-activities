@@ -12,13 +12,14 @@
 import { CalendarView } from "./calendar-view.js";
 import { DateRangePicker } from "./date-range-picker.js";
 import { addDays, parseDate, toDateKey } from "./date-utils.js";
+import { LanguagePicker } from "./language-picker.js";
 import {
   getMessages,
   normalizeLanguage,
   SUPPORTED_LANGUAGES,
   translateDocument,
 } from "./i18n.js";
-import { readShareUrl, updateShareUrl } from "./share.js";
+import { clearShareUrl, readShareUrl, updateShareUrl } from "./share.js";
 import {
   clearVisibleContent,
   getCalendarId,
@@ -45,6 +46,7 @@ let language = "en";
 let messages = getMessages(language);
 let statusTimer = null;
 let shareTimer = null;
+let shareUpdatesEnabled = false;
 
 /** Read the current control values into the application's settings shape. */
 function getSettings() {
@@ -79,6 +81,16 @@ const dateRangePicker = new DateRangePicker({
   getWeekStart: () => elements.weekStart.value,
 });
 
+const languagePicker = new LanguagePicker({
+  root: document.querySelector("#languagePicker"),
+  input: elements.language,
+  trigger: document.querySelector("#languageTrigger"),
+  menu: document.querySelector("#languageMenu"),
+  flag: document.querySelector("#selectedLanguageFlag"),
+  name: document.querySelector("#selectedLanguageName"),
+  onChange: applyLanguage,
+});
+
 /**
  * Rebuild the grid. Before identity-changing edits, visible content is copied
  * into the new namespace so a project rename or range adjustment feels safe.
@@ -103,6 +115,10 @@ function refreshCalendar({ carryVisibleContent = false } = {}) {
 
 /** Debounce URL work so typing a note does not rewrite history every keystroke. */
 function scheduleShareUpdate() {
+  // Initialization may restore URL or local state, but it must never create a
+  // query string until the user deliberately changes something.
+  if (!shareUpdatesEnabled) return;
+
   window.clearTimeout(shareTimer);
   shareTimer = window.setTimeout(() => {
     const settings = getSettings();
@@ -119,7 +135,7 @@ function scheduleShareUpdate() {
 function applyLanguage(nextLanguage, { rerender = true } = {}) {
   language = normalizeLanguage(nextLanguage);
   messages = getMessages(language);
-  elements.language.value = language;
+  languagePicker.setValue(language);
   saveLanguage(language);
   translateDocument(language);
   dateRangePicker.update({ language, messages });
@@ -153,7 +169,7 @@ function initialize() {
 
   language = normalizeLanguage(preferredLanguage);
   messages = getMessages(language);
-  elements.language.value = language;
+  languagePicker.setValue(language);
   translateDocument(language);
 
   const settings = getSettings();
@@ -171,7 +187,7 @@ function initialize() {
   dateRangePicker.update({ language, messages });
   saveSettings(settings);
   saveLanguage(language);
-  scheduleShareUpdate();
+  shareUpdatesEnabled = true;
   setStatus(messages.ready);
 }
 
@@ -191,8 +207,6 @@ function bindApplicationEvents() {
   elements.weekStart.addEventListener("change", () => {
     refreshCalendar({ carryVisibleContent: true });
   });
-  elements.language.addEventListener("change", () => applyLanguage(elements.language.value));
-
   document.querySelector("#printButton").addEventListener("click", () => window.print());
 
   document.querySelector("#clearButton").addEventListener("click", () => {
@@ -219,6 +233,12 @@ function bindApplicationEvents() {
     const blankSettings = getSettings();
     clearVisibleContent(getCalendarId(blankSettings), calendarView.getVisibleDateKeys());
     refreshCalendar();
+
+    // Clearing is intentionally different from normal edits: it removes all
+    // shared state from the address bar and cancels queued URL rewrites.
+    window.clearTimeout(shareTimer);
+    shareTimer = null;
+    clearShareUrl();
     setStatus(messages.allCleared);
   });
 
@@ -226,6 +246,7 @@ function bindApplicationEvents() {
     if (event.key !== "Escape") return;
     calendarView.hideColorMenu();
     dateRangePicker.close();
+    languagePicker.close();
   });
 }
 

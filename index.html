@@ -8,8 +8,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A lightweight, private, browser-based calendar for planning activities, deliverables, and shifts.">
+    <meta name="referrer" content="no-referrer">
     <meta name="theme-color" content="#0f766e">
     <title>Dynamic Calendar</title>
+    <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+    <!-- Pinned flag-icons release; language names remain usable if it fails. -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="assets/css/main.css">
   </head>
   <body>
@@ -136,13 +141,42 @@
             </div>
 
             <div class="field language-field">
-              <label for="language" data-i18n="language">Language</label>
-              <select id="language">
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="it">Italiano</option>
-                <option value="pt">Português</option>
-              </select>
+              <label id="languageLabel" for="languageTrigger" data-i18n="language">Language</label>
+              <div class="language-picker" id="languagePicker">
+                <!-- The hidden value keeps application state independent from presentation. -->
+                <input type="hidden" id="language" name="language" value="en">
+                <button
+                  class="language-trigger"
+                  type="button"
+                  id="languageTrigger"
+                  aria-haspopup="menu"
+                  aria-expanded="false"
+                  aria-controls="languageMenu"
+                  aria-labelledby="languageLabel selectedLanguageName"
+                >
+                  <span class="fi fi-gb" id="selectedLanguageFlag" aria-hidden="true"></span>
+                  <span id="selectedLanguageName">English</span>
+                  <span class="language-chevron" aria-hidden="true">⌄</span>
+                </button>
+                <div class="language-menu" id="languageMenu" role="menu" hidden>
+                  <button type="button" role="menuitemradio" aria-checked="true" data-language="en">
+                    <span class="fi fi-gb" aria-hidden="true"></span>
+                    <span>English</span>
+                  </button>
+                  <button type="button" role="menuitemradio" aria-checked="false" data-language="es">
+                    <span class="fi fi-es" aria-hidden="true"></span>
+                    <span>Español</span>
+                  </button>
+                  <button type="button" role="menuitemradio" aria-checked="false" data-language="it">
+                    <span class="fi fi-it" aria-hidden="true"></span>
+                    <span>Italiano</span>
+                  </button>
+                  <button type="button" role="menuitemradio" aria-checked="false" data-language="pt">
+                    <span class="fi fi-pt" aria-hidden="true"></span>
+                    <span>Português</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </form>
@@ -185,10 +219,15 @@
         redistribute and modify it under the GNU AGPL v3 or later. It is
         provided without warranty.
       </p>
+      <p class="repository-note">
+        Source, issue tracking, and community contributions are maintained in the GitHub repository.
+      </p>
       <nav aria-label="Legal and source information">
         <a href="LICENSE">License</a>
         <a href="NOTICE.md">Attribution</a>
-        <a href="https://github.com/emanuelbarbera/dynamic-calendar-activities">Source code</a>
+        <a href="https://github.com/emanuelbarbera/dynamic-calendar-activities">GitHub repository</a>
+        <a href="https://github.com/emanuelbarbera/dynamic-calendar-activities/issues">Report an issue</a>
+        <a href="https://github.com/emanuelbarbera/dynamic-calendar-activities/blob/main/CONTRIBUTING.md">Contribute</a>
       </nav>
     </footer>
 

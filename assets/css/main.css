@@ -191,6 +191,101 @@ h1 {
 }
 
 /* ==========================================================================
+   Language picker
+   ========================================================================== */
+
+.language-picker {
+  position: relative;
+}
+
+.language-trigger {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  color: var(--color-ink);
+  background: #ffffff;
+  text-align: left;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+
+.language-trigger:hover {
+  border-color: #94a3b8;
+}
+
+.language-trigger:focus-visible,
+.language-trigger[aria-expanded="true"] {
+  border-color: var(--color-brand);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgb(15 118 110 / 14%);
+}
+
+.language-trigger .fi,
+.language-menu .fi {
+  flex: none;
+  width: 20px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgb(15 23 42 / 12%);
+}
+
+.language-chevron {
+  margin-left: auto;
+  color: var(--color-muted);
+  font-size: 1rem;
+  transition: transform 150ms;
+}
+
+.language-trigger[aria-expanded="true"] .language-chevron {
+  transform: rotate(180deg);
+}
+
+.language-menu {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 7px);
+  right: 0;
+  left: 0;
+  padding: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgb(15 23 42 / 16%);
+}
+
+.language-menu[hidden] {
+  display: none;
+}
+
+.language-menu button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--color-ink);
+  background: transparent;
+  text-align: left;
+}
+
+.language-menu button:hover,
+.language-menu button:focus-visible,
+.language-menu button[aria-checked="true"] {
+  outline: 0;
+  background: var(--color-brand-soft);
+}
+
+.language-menu button[aria-checked="true"] {
+  color: var(--color-brand-dark);
+  font-weight: 750;
+}
+
+/* ==========================================================================
    Date-range picker
    ========================================================================== */
 
@@ -944,6 +1039,10 @@ h1 {
 
 .legal-notice p {
   margin: 0;
+}
+
+.legal-notice .repository-note {
+  margin-top: 4px;
 }
 
 .legal-notice nav {

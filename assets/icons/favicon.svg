@@ -1,0 +1,11 @@
+<!--
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  Copyright (C) 2026 Emanuel Barbera
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Dynamic Calendar">
+  <rect width="64" height="64" rx="14" fill="#0f766e"/>
+  <rect x="11" y="15" width="42" height="38" rx="7" fill="#fff"/>
+  <path d="M11 26h42" stroke="#0f766e" stroke-width="5"/>
+  <path d="M22 10v11M42 10v11" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M21 36h7M36 36h7M21 45h7M36 45h7" stroke="#0f766e" stroke-width="5" stroke-linecap="round"/>
+</svg>

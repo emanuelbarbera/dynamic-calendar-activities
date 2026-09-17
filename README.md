@@ -22,10 +22,11 @@ Many planning tools are excellent but unnecessarily heavy for a short-lived proj
 - Editable daily notes with automatic local saving.
 - Color applied to a selection, a full week row, or a weekday column.
 - English, Spanish, Italian, and Portuguese interfaces.
+- Flag-assisted language menu with text fallbacks and keyboard navigation.
 - Shareable URLs containing the visible calendar state.
 - Responsive layout and reduced-motion support.
 - A4 landscape print and PDF styling.
-- No remote assets or runtime network requests.
+- No backend, analytics, remote fonts, or runtime application services.
 - No production install or build step.
 
 ## Quick start
@@ -60,9 +61,13 @@ The application has two client-side storage mechanisms:
 - `localStorage` keeps settings, daily notes, colors, and language preferences on the current device and browser profile.
 - The URL query string contains a Base64URL-encoded copy of the visible calendar so the view can be shared without a server.
 
+The initial page render never creates a query string. Share parameters are written only after a user changes the calendar. **Clear all** removes the visible content and every query parameter from the current URL. Existing share parameters are still read on arrival so shared links continue to work.
+
 Base64 is encoding, not encryption. Anyone who receives a shared URL can decode and read its notes. Do not put secrets, credentials, regulated data, or sensitive personal information in a shared calendar URL.
 
 There is no cloud synchronization. Clearing browser data removes locally saved calendars. A recipient who edits a shared calendar changes only their own browser copy and URL.
+
+The only third-party runtime request is the pinned `flag-icons` stylesheet and its SVG flags from jsDelivr. It receives ordinary web-request metadata such as the visitor's IP address and user agent, but never receives calendar content from the application. Language names remain available if that request is blocked or offline.
 
 Very large calendars or long notes create longer URLs. Browser and messaging-platform limits vary, so keep URL-shared calendars reasonably concise. A future optional export/import file format would be the best solution for large plans while preserving the backend-free design.
 
@@ -74,12 +79,15 @@ Very large calendars or long notes create longer URLs. Browser and messaging-pla
 ├── assets/
 │   ├── css/
 │   │   └── main.css              # Screen, responsive, and print styles
+│   ├── icons/
+│   │   └── favicon.svg           # Lightweight application icon
 │   └── js/
 │       ├── app.js                # Application composition and event flow
 │       ├── calendar-view.js      # Calendar rendering, notes, and colors
 │       ├── date-range-picker.js  # Date-range popover behavior
 │       ├── date-utils.js         # Pure local-date helpers
 │       ├── i18n.js               # Translations and DOM localization
+│       ├── language-picker.js    # Accessible flag-assisted language menu
 │       ├── share.js              # Validated URL serialization
 │       └── storage.js            # localStorage adapter and key ownership
 ├── tests/
@@ -104,6 +112,7 @@ The project uses native browser ES modules. Each module has a narrow responsibil
 - `share.js` treats URL data as untrusted input, validates it, and serializes visible state.
 - `date-utils.js` contains pure date operations that can be tested without a browser.
 - `i18n.js` contains the language dictionaries and the small translation layer.
+- `language-picker.js` manages the accessible language menu and its visual flag state.
 
 This separation keeps the application easy to review without introducing a framework, bundler, package download, or runtime service.
 
@@ -121,7 +130,7 @@ calendar-view.js → visible calendar
    share.js → current URL
 ```
 
-The DOM is the working view of daily notes and colors. Storage is the durable local copy. The current URL is a debounced, portable snapshot of visible content.
+The DOM is the working view of daily notes and colors. Storage is the durable local copy. After a manual edit, the current URL becomes a debounced, portable snapshot of visible content; initialization alone leaves the address unchanged.
 
 ## Development
 
@@ -154,7 +163,7 @@ More detail is available in [CONTRIBUTING.md](CONTRIBUTING.md).
 - Store local calendar dates as `YYYY-MM-DD`; do not parse them as UTC timestamps.
 - Comment intent, invariants, and non-obvious tradeoffs rather than restating syntax.
 - Preserve the no-build production path unless a clear user benefit justifies changing it.
-- Avoid remote fonts, flag images, trackers, and assets that weaken offline behavior or privacy.
+- Keep remote assets exceptional, version-pinned, documented, and usable with a local text fallback.
 - Keep destructive actions explicit and confirmed.
 
 Preserve SPDX headers, copyright notices, the in-app source link, `NOTICE.md`, and the complete license text when modifying or redistributing the project.
@@ -164,8 +173,9 @@ Preserve SPDX headers, copyright notices, the in-app source link, `NOTICE.md`, a
 1. Copy the English dictionary in `assets/js/i18n.js`.
 2. Translate every user-facing value while keeping the keys unchanged.
 3. Add the language code to `SUPPORTED_LANGUAGES`.
-4. Add an option to the `#language` select in `index.html`.
-5. Exercise the date picker, action buttons, confirmations, placeholders, and print view.
+4. Add the language metadata to `LANGUAGE_OPTIONS` in `language-picker.js`.
+5. Add a matching menu button to `#languageMenu` in `index.html`.
+6. Exercise the date picker, action buttons, confirmations, placeholders, and print view.
 
 Keep language names in their native form (for example, `Italiano`) so users can recognize them regardless of the current interface language.
 
@@ -208,7 +218,7 @@ Other good fits include GitLab Pages, Cloudflare Pages, Netlify, Vercel static h
 For production, consider these response headers when your host supports them:
 
 ```text
-Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
+Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
 Referrer-Policy: no-referrer
 X-Content-Type-Options: nosniff
 Permissions-Policy: camera=(), microphone=(), geolocation=()
@@ -249,9 +259,17 @@ Performance work should be driven by measurements. For typical project ranges, d
 
 - Data is tied to one browser profile unless a URL is shared.
 - Share URLs may become long when many notes are present.
+- Country flags require access to the pinned jsDelivr asset; language text remains functional without it.
 - Browser storage quotas and privacy settings vary.
 - A week is displayed as seven columns; narrow devices scroll horizontally.
 - There is no collaboration, conflict resolution, account recovery, or server backup by design.
+
+## Project links
+
+- [GitHub repository](https://github.com/emanuelbarbera/dynamic-calendar-activities)
+- [Issue tracker](https://github.com/emanuelbarbera/dynamic-calendar-activities/issues)
+- [Contribution guide](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
 
 ## License
 
