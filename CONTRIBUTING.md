@@ -92,6 +92,12 @@ A pull request should include:
 
 Reviewers may ask for a smaller change, clearer naming, a regression test, or an explanation of how the proposal preserves the project's lightweight and private nature.
 
+## Contribution license
+
+This project is licensed under `AGPL-3.0-or-later`. By submitting a contribution, you confirm that you have the right to provide it and agree that it will be licensed under the same terms without an additional contributor agreement.
+
+Do not remove or weaken SPDX identifiers, copyright notices, modification notices, the in-app legal notice, source-code access, `NOTICE.md`, or the complete `LICENSE` text. Operators of modified network versions must update the in-app **Source code** link so it provides the corresponding source for the version users are running. New third-party material must have a compatible license and must be documented in `NOTICE.md` before inclusion.
+
 ## Reporting security problems
 
 Please follow [SECURITY.md](SECURITY.md). Do not publish a vulnerability with sensitive reproduction details before maintainers have had a reasonable opportunity to respond.

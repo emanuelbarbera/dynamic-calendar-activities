@@ -2,7 +2,7 @@
 
 A lightweight, private, browser-based planner for activities, deliverables, and shifts. Choose any date range, write directly into each day, add color, share the current view through its URL, and print a clean landscape calendar.
 
-The application is intentionally built with semantic HTML, modern CSS, and vanilla JavaScript. It has no framework, production dependencies, database, account system, analytics, or backend.
+The application is intentionally built with semantic HTML, modern CSS, and vanilla JavaScript. It has no framework, production dependencies, database, account system, analytics, or backend. It is free software released under the GNU Affero General Public License v3 or later.
 
 ## Why this project exists
 
@@ -86,8 +86,9 @@ Very large calendars or long notes create longer URLs. Browser and messaging-pla
 │   └── date-utils.test.js        # Dependency-free Node.js unit tests
 ├── .github/                       # Issue and pull-request review templates
 ├── CONTRIBUTING.md               # Contribution workflow and standards
+├── NOTICE.md                     # Copyright and attribution information
 ├── SECURITY.md                   # Private vulnerability reporting guidance
-├── LICENSE                       # MIT License
+├── LICENSE                       # GNU AGPL v3 license text
 ├── package.json                  # Optional checks; no dependencies
 └── README.md
 ```
@@ -156,6 +157,8 @@ More detail is available in [CONTRIBUTING.md](CONTRIBUTING.md).
 - Avoid remote fonts, flag images, trackers, and assets that weaken offline behavior or privacy.
 - Keep destructive actions explicit and confirmed.
 
+Preserve SPDX headers, copyright notices, the in-app source link, `NOTICE.md`, and the complete license text when modifying or redistributing the project.
+
 ## Adding a language
 
 1. Copy the English dictionary in `assets/js/i18n.js`.
@@ -168,7 +171,7 @@ Keep language names in their native form (for example, `Italiano`) so users can 
 
 ## Deploying to GitHub Pages
 
-The repository includes `.github/workflows/pages.yml`, which validates and publishes the application automatically. It runs the tests and syntax checks first, then uploads only `index.html` and `assets/` as the public website.
+The repository includes `.github/workflows/pages.yml`, which validates and publishes the application automatically. It runs the tests and syntax checks first, then uploads only the runtime files and required legal notices as the public website.
 
 To enable the deployment:
 
@@ -189,6 +192,12 @@ No base-path configuration is required. HTML assets and JavaScript imports use r
 The workflow publishes only from `main`. If the repository uses another default branch, update the branch under `on.push.branches` in `.github/workflows/pages.yml`.
 
 The included `.nojekyll` file also makes the source compatible with GitHub Pages' simpler branch-based publishing mode, although the Actions workflow is recommended because it validates the project before release.
+
+### Account-level custom domains
+
+GitHub automatically applies a custom domain configured on an account-level `<account>.github.io` site to that account's project sites. For example, a project may be published at `https://www.example.com/project/` instead of `https://account.github.io/project/`. This behavior is controlled by GitHub Pages and cannot be overridden by an HTML setting.
+
+To restore the default `github.io` addresses for all project sites, remove the custom domain from the `<account>.github.io` repository under **Settings → Pages → Custom domain**. To keep the account website on its custom domain, give this project a distinct subdomain such as `calendar.example.com` instead. Configure that domain in this repository's Pages settings and point its DNS `CNAME` record to `<account>.github.io`.
 
 ### Other static hosts
 
@@ -246,4 +255,18 @@ Performance work should be driven by measurements. For typical project ranges, d
 
 ## License
 
-Released under the [MIT License](LICENSE).
+Copyright © 2026 Emanuel Barbera.
+
+Dynamic Calendar Activities is free software released under the [GNU Affero General Public License, version 3 or any later version](LICENSE). The SPDX identifier is `AGPL-3.0-or-later`.
+
+In practical terms:
+
+- Individuals and companies may use the application, including commercially.
+- Anyone may inspect, copy, modify, and redistribute it under the license terms.
+- Distributed modified versions must remain under the same license and provide their corresponding source.
+- Modified versions made available to users over a network must offer those users the corresponding source at no charge.
+- Copyright, license, warranty, attribution, and modification notices must be preserved as required by the license.
+
+“Free software” refers to user freedoms, not necessarily a zero price. The AGPL permits charging for copies, hosting, customization, or support; it prevents recipients from losing the freedoms granted by the license.
+
+See [NOTICE.md](NOTICE.md) for the concise attribution notice. Versions already received under an earlier license remain governed by the license terms under which those copies were received.
