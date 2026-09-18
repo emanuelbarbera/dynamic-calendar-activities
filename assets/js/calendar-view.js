@@ -89,6 +89,7 @@ export class CalendarView {
     this.updatePrintSizing(weeksCount);
     this.renderWeekdayHeader(start, settings.weekStart, messages, spansMultipleMonths);
     this.renderWeeks({ start, end, first, last, messages, spansMultipleMonths });
+    this.updatePrintGroupSizing();
     return true;
   }
 
@@ -170,8 +171,19 @@ export class CalendarView {
   }
 
   updatePrintSizing(weeksCount) {
-    const height = weeksCount <= 4 ? "39mm" : weeksCount === 5 ? "32mm" : "26mm";
-    document.documentElement.style.setProperty("--print-day-height", height);
+    this.printWeekHeightMm = weeksCount <= 4 ? 39 : weeksCount === 5 ? 32 : 26;
+    document.documentElement.style.setProperty("--print-day-height", `${this.printWeekHeightMm}mm`);
+  }
+
+  /** Give each printable month an explicit height so page layout stays stable. */
+  updatePrintGroupSizing() {
+    const groups = [...this.calendar.querySelectorAll(".calendar-month-group")];
+
+    groups.forEach((group) => {
+      const weekCount = group.querySelectorAll(".calendar-week").length;
+      const printHeight = weekCount * this.printWeekHeightMm + 0.3;
+      group.style.setProperty("--month-print-height", `${printHeight}mm`);
+    });
   }
 
   renderWeekdayHeader(start, weekStart, messages, withMonthMargin) {

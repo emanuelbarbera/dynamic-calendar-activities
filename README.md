@@ -1,6 +1,6 @@
 # Dynamic Calendar Activities
 
-A lightweight, private, browser-based planner for activities, deliverables, and shifts. Choose any date range, write directly into each day, add color, share the current view through its URL, and print a clean landscape calendar.
+A lightweight, private, browser-based planner for activities, deliverables, and shifts. Choose any date range, write directly into each day, add color, share the current view through its URL, and print a clean calendar.
 
 [Open the live demo](https://calendar.emanuelbarbera.it/)
 
@@ -28,8 +28,8 @@ Many planning tools are excellent but unnecessarily heavy for a short-lived proj
 - Flag-assisted language menu with text fallbacks and keyboard navigation.
 - Shareable URLs containing the visible calendar state.
 - Responsive layout and reduced-motion support.
-- A4 landscape print and PDF styling.
-- Month groups remain intact across printed pages whenever they fit on one page.
+- Print and PDF styling for both portrait and landscape layouts.
+- Space-efficient pagination that keeps each month group intact while placing consecutive months on the same page when they fit.
 - No backend, analytics, remote fonts, or runtime application services.
 - No production install or build step.
 
@@ -54,7 +54,7 @@ Any static server works. For example, an editor's preview server or `npx serve` 
 3. Choose when calendar weeks should begin.
 4. Click inside a day and type a note. Changes are saved automatically.
 5. Right-click a day, or drag across day headers, to select cells and apply a color.
-6. Use **Print / save PDF** for an A4 landscape copy.
+6. Choose **Landscape** or **Portrait** beside the print button, then use **Print / save PDF**. The application prepares an A4 layout with compact, month-safe page breaks.
 
 Changing the project name, date range, or week mode carries visible notes and colors into the new calendar identity. Other saved calendars are left untouched.
 

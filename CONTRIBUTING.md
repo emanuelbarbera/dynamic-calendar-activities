@@ -78,8 +78,8 @@ Then verify the behavior relevant to your change. For broad UI work, cover:
 - No query parameters on an untouched initial load, and complete URL cleanup after **Clear all**.
 - Language switching.
 - Mobile layout around 390 CSS pixels wide.
-- Print preview in A4 landscape.
-- Multi-month printing without splitting a month label from its week rows.
+- Print preview in both portrait and landscape orientation.
+- Multi-month printing that packs complete month groups efficiently without splitting a month label from its week rows.
 - Keyboard focus visibility and `Escape` behavior.
 
 ## Pull request expectations

@@ -770,6 +770,33 @@ html[dir="rtl"] .travel-arrow-wrap {
   gap: 8px;
 }
 
+.print-orientation-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  color: #334155;
+  background: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.print-orientation-control select {
+  min-height: 38px;
+  padding: 0 24px 0 6px;
+  border: 0;
+  outline: 0;
+  color: var(--color-ink);
+  background: transparent;
+}
+
+.print-orientation-control:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgb(15 118 110 / 14%);
+}
+
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -1167,11 +1194,6 @@ html[dir="rtl"] .travel-arrow-wrap {
    ========================================================================== */
 
 @media print {
-  @page {
-    size: A4 landscape;
-    margin: 7mm;
-  }
-
   :root {
     --color-line: #9ca3af;
   }
@@ -1227,15 +1249,40 @@ html[dir="rtl"] .travel-arrow-wrap {
   }
 
   /*
-   * Keep the vertical month label and all of its week rows in one printable
-   * fragment. Without this rule, browsers may move individual rows to the
-   * next page while splitting or detaching the month indicator on the left.
+   * Replace the screen flex layout with a print-stable atomic box. Chromium
+   * can fragment flex children inconsistently, splitting the vertical label
+   * or compressing week rows. The explicit height and inline-block formatting
+   * keep each month intact while still allowing multiple months on one page.
    */
-  .calendar-month-group,
-  .month-indicator,
+  .calendar-month-group {
+    position: relative;
+    /* `!important` is scoped to print and prevents Chromium's fragmenter from
+       reverting this box to the screen flex layout on later pages. */
+    display: inline-block !important;
+    width: 100%;
+    height: var(--month-print-height);
+    min-height: var(--month-print-height);
+    padding-inline-start: 38px;
+    overflow: hidden;
+    vertical-align: top;
+  }
+
+  /* The first month always fits below the heading. Following months are
+     atomic inline blocks: browsers may pack them together but cannot split
+     their vertical label or week rows between pages. */
+  .weekdays + .calendar-month-group {
+    display: block !important;
+  }
+
+  .month-indicator {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 38px;
+  }
+
   .month-weeks {
-    page-break-inside: avoid;
-    break-inside: avoid-page;
+    display: block;
   }
 
   .weekday {
@@ -1245,15 +1292,19 @@ html[dir="rtl"] .travel-arrow-wrap {
   }
 
   .calendar-week {
+    height: var(--print-day-height);
     border-color: var(--color-line);
-    break-inside: avoid-page;
+    page-break-inside: auto;
+    break-inside: auto;
   }
 
   .day {
-    min-height: var(--print-day-height);
+    height: var(--print-day-height);
+    min-height: 0;
     padding: 2.3mm;
     border-color: var(--color-line);
-    break-inside: avoid-page;
+    page-break-inside: auto;
+    break-inside: auto;
   }
 
   .day-head {

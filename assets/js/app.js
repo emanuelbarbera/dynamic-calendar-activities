@@ -36,6 +36,7 @@ const elements = {
   start: document.querySelector("#startDate"),
   end: document.querySelector("#endDate"),
   weekStart: document.querySelector("#weekStart"),
+  printOrientation: document.querySelector("#printOrientation"),
   language: document.querySelector("#language"),
   status: document.querySelector("#saveStatus"),
   calendar: document.querySelector("#calendar"),
@@ -56,6 +57,12 @@ function getSettings() {
     end: elements.end.value,
     weekStart: elements.weekStart.value,
   };
+}
+
+/** Apply the selected A4 page orientation before opening print preview. */
+function applyPrintOrientation() {
+  const orientation = elements.printOrientation.value === "portrait" ? "portrait" : "landscape";
+  document.querySelector("#printPageStyle").textContent = `@page { size: A4 ${orientation}; margin: 7mm; }`;
 }
 
 /** Announce a status immediately and optionally replace it after a short delay. */
@@ -171,6 +178,7 @@ function initialize() {
   messages = getMessages(language);
   languagePicker.setValue(language);
   translateDocument(language);
+  applyPrintOrientation();
 
   const settings = getSettings();
   const calendarId = getCalendarId(settings);
@@ -207,6 +215,7 @@ function bindApplicationEvents() {
   elements.weekStart.addEventListener("change", () => {
     refreshCalendar({ carryVisibleContent: true });
   });
+  elements.printOrientation.addEventListener("change", applyPrintOrientation);
   document.querySelector("#printButton").addEventListener("click", () => window.print());
 
   document.querySelector("#clearButton").addEventListener("click", () => {

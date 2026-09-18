@@ -11,6 +11,8 @@
     <meta name="referrer" content="no-referrer">
     <meta name="theme-color" content="#0f766e">
     <title>Dynamic Calendar</title>
+    <!-- JavaScript updates this lightweight rule when print orientation changes. -->
+    <style id="printPageStyle">@page { size: A4 landscape; margin: 7mm; }</style>
     <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
     <!-- Pinned flag-icons release; language names remain usable if it fails. -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -223,6 +225,13 @@
           </div>
 
           <div class="calendar-actions" aria-label="Calendar actions">
+            <label class="print-orientation-control" for="printOrientation">
+              <span data-i18n="printOrientation">Print orientation</span>
+              <select id="printOrientation">
+                <option value="landscape" data-i18n="landscape">Landscape</option>
+                <option value="portrait" data-i18n="portrait">Portrait</option>
+              </select>
+            </label>
             <button class="button ghost" type="button" id="printButton" data-i18n="print">Print / save PDF</button>
             <button class="button ghost" type="button" id="clearColorsButton" data-i18n="removeColors">Remove colors</button>
             <button class="button danger" type="button" id="clearButton" data-i18n="clearNotes">Clear visible notes</button>
