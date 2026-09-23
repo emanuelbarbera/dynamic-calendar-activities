@@ -111,10 +111,10 @@ h1 {
 }
 
 .intro {
-  max-width: 680px;
   margin: 8px 0 0;
   color: var(--color-muted);
   line-height: 1.5;
+  white-space: nowrap;
 }
 
 .status {
@@ -1233,6 +1233,10 @@ html[dir="rtl"] .travel-arrow-wrap {
   .masthead,
   .calendar-top {
     display: block;
+  }
+
+  .intro {
+    white-space: normal;
   }
 
   .status {
