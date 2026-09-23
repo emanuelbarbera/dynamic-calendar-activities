@@ -37,6 +37,7 @@ const elements = {
   end: document.querySelector("#endDate"),
   weekStart: document.querySelector("#weekStart"),
   printOrientation: document.querySelector("#printOrientation"),
+  orientationButtons: [...document.querySelectorAll(".orientation-button")],
   share: document.querySelector("#shareButton"),
   language: document.querySelector("#language"),
   status: document.querySelector("#saveStatus"),
@@ -62,6 +63,11 @@ function getSettings() {
 /** Apply the selected A4 page orientation before opening print preview. */
 function applyPrintOrientation() {
   const orientation = elements.printOrientation.value === "portrait" ? "portrait" : "landscape";
+  elements.orientationButtons.forEach((button) => {
+    const active = button.dataset.orientation === orientation;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
   document.querySelector("#printPageStyle").textContent = `@page { size: A4 ${orientation}; margin: 7mm; }`;
 }
 
@@ -242,6 +248,12 @@ function bindApplicationEvents() {
   elements.printOrientation.addEventListener("change", () => {
     applyPrintOrientation();
     saveSettings(getSettings());
+  });
+  elements.orientationButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      elements.printOrientation.value = button.dataset.orientation;
+      elements.printOrientation.dispatchEvent(new Event("change"));
+    });
   });
   elements.share.addEventListener("click", shareCalendar);
   document.querySelector("#printButton").addEventListener("click", () => window.print());

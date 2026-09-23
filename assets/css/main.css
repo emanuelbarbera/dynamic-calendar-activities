@@ -82,6 +82,8 @@ select {
 }
 
 .controls {
+  position: relative;
+  z-index: 20;
   backdrop-filter: blur(12px);
 }
 
@@ -737,6 +739,8 @@ html[dir="rtl"] .travel-arrow-wrap {
 }
 
 .calendar-wrapper {
+  position: relative;
+  z-index: 1;
   margin-top: 26px;
   overflow: hidden;
   background: var(--color-paper);
@@ -765,36 +769,87 @@ html[dir="rtl"] .travel-arrow-wrap {
 
 .calendar-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 6px;
+  max-width: 100%;
+  padding: 2px;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
-.print-orientation-control {
+.action-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.action-group .button {
+  min-height: 32px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.button-icon,
+.icon-button svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.compact-action {
+  gap: 6px;
+}
+
+.icon-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  color: #334155;
-  background: #ffffff;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.print-orientation-control select {
-  min-height: 38px;
-  padding: 0 24px 0 6px;
-  border: 0;
-  outline: 0;
-  color: var(--color-ink);
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #64748b;
   background: transparent;
+  transition: color 150ms, background 150ms, border-color 150ms, transform 150ms;
 }
 
-.print-orientation-control:focus-within {
-  border-color: var(--color-brand);
-  box-shadow: 0 0 0 3px rgb(15 118 110 / 14%);
+.icon-button:hover {
+  color: var(--color-brand-dark);
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.icon-button:focus-visible {
+  outline: 3px solid rgb(13 148 136 / 25%);
+  outline-offset: 1px;
+}
+
+.orientation-button.active,
+.orientation-button[aria-pressed="true"] {
+  border-color: rgb(15 118 110 / 28%);
+  color: var(--color-brand-dark);
+  background: var(--color-brand-soft);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 8%);
+}
+
+.destructive-actions {
+  border-color: #fecaca;
+  background: #fffafa;
 }
 
 .legend {
