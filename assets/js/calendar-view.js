@@ -57,11 +57,10 @@ export class CalendarView {
       else this.clearSelection();
     });
 
+    // Close the previous menu before a day can start a fresh selection.
     document.addEventListener("pointerdown", (event) => {
-      if (!this.colorMenu.contains(event.target) && !event.target.closest(".day")) {
-        this.hideColorMenu();
-      }
-    });
+      if (!this.colorMenu.contains(event.target)) this.hideColorMenu();
+    }, { capture: true });
   }
 
   /** Render a complete calendar from immutable settings and translations. */
