@@ -44,6 +44,7 @@ function sanitizeShareData(value) {
 
   const notes = {};
   const colors = {};
+  const sharedNotes = [];
 
   Object.entries(value.notes ?? value.n ?? {}).forEach(([dateKey, text]) => {
     if (isDateKey(dateKey) && typeof text === "string") {
@@ -57,6 +58,13 @@ function sanitizeShareData(value) {
     }
   });
 
+  const sharedNoteGroups = value.sharedNotes ?? value.g ?? [];
+  (Array.isArray(sharedNoteGroups) ? sharedNoteGroups : []).forEach((dates) => {
+    if (!Array.isArray(dates)) return;
+    const normalized = [...new Set(dates.filter((dateKey) => isDateKey(dateKey)))].slice(0, 366);
+    if (normalized.length > 1) sharedNotes.push(normalized);
+  });
+
   return {
     v: 1,
     project: typeof (value.project ?? value.p) === "string"
@@ -64,6 +72,7 @@ function sanitizeShareData(value) {
       : "",
     notes,
     colors,
+    sharedNotes,
   };
 }
 
@@ -99,6 +108,7 @@ export function updateShareUrl({ settings, language, snapshot }) {
       project: settings.project,
       notes: snapshot.notes,
       colors: snapshot.colors,
+      sharedNotes: snapshot.sharedNotes,
     }));
     window.history.replaceState(null, "", url);
   } catch {

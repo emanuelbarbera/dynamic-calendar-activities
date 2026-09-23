@@ -253,6 +253,7 @@ function bindApplicationEvents() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
+    calendarView.closeSharedNotesEditor();
     calendarView.hideColorMenu();
     dateRangePicker.close();
     languagePicker.close();

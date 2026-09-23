@@ -92,7 +92,7 @@ export const translations = {
     calendarActions: "Calendar actions",
     calendarLegend: "Calendar legend",
     calendarRegion: "Generated calendar",
-    hint: "Tip: write directly inside a day. Right-click or drag across day headers to add color.",
+    hint: "Tip: write in one day, or drag across writing areas to share one centered note. Drag across headers to add color.",
     activitiesFor: "Activities for",
   },
   es: {
@@ -158,7 +158,7 @@ export const translations = {
     calendarActions: "Acciones del calendario",
     calendarLegend: "Leyenda del calendario",
     calendarRegion: "Calendario generado",
-    hint: "Consejo: escribe dentro de un día. Haz clic derecho o arrastra sobre los encabezados para añadir color.",
+    hint: "Consejo: escribe en un día o arrastra por las áreas de escritura para compartir una nota centrada. Arrastra por los encabezados para añadir color.",
     activitiesFor: "Actividades del",
   },
   it: {
@@ -224,7 +224,7 @@ export const translations = {
     calendarActions: "Azioni del calendario",
     calendarLegend: "Legenda del calendario",
     calendarRegion: "Calendario generato",
-    hint: "Suggerimento: scrivi dentro un giorno. Fai clic destro o trascina sulle intestazioni per aggiungere colore.",
+    hint: "Suggerimento: scrivi in un giorno o trascina sulle aree di scrittura per condividere una nota centrata. Trascina sulle intestazioni per aggiungere colore.",
     activitiesFor: "Attività per",
   },
   pt: {
@@ -290,7 +290,7 @@ export const translations = {
     calendarActions: "Ações do calendário",
     calendarLegend: "Legenda do calendário",
     calendarRegion: "Calendário gerado",
-    hint: "Dica: escreva dentro de um dia. Clique com o botão direito ou arraste nos cabeçalhos para adicionar cor.",
+    hint: "Dica: escreva num dia ou arraste pelas áreas de escrita para partilhar uma nota centrada. Arraste pelos cabeçalhos para adicionar cor.",
     activitiesFor: "Atividades de",
   },
   ...additionalTranslations,

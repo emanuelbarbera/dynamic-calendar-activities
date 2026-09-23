@@ -55,6 +55,10 @@ function colorKey(calendarId, dateKey) {
   return `${CONTENT_PREFIX}:color:${calendarId}:${dateKey}`;
 }
 
+function sharedNotesKey(calendarId) {
+  return `${CONTENT_PREFIX}:shared-notes:${calendarId}`;
+}
+
 /** Load the last-used project settings, or an empty object on invalid data. */
 export function loadSettings() {
   try {
@@ -112,6 +116,28 @@ export function removeColor(calendarId, dateKey) {
   remove(colorKey(calendarId, dateKey));
 }
 
+/** Load the date groups that are displayed as one shared note box. */
+export function loadSharedNoteGroups(calendarId) {
+  try {
+    const groups = JSON.parse(read(sharedNotesKey(calendarId)) ?? "[]");
+    if (!Array.isArray(groups)) return [];
+    return groups
+      .map((dates) => [...new Set(Array.isArray(dates) ? dates.filter((date) => typeof date === "string") : [])])
+      .filter((dates) => dates.length > 1);
+  } catch {
+    return [];
+  }
+}
+
+/** Save or remove the shared-note grouping metadata for a calendar. */
+export function saveSharedNoteGroups(calendarId, groups) {
+  const normalized = (groups ?? [])
+    .map((dates) => [...new Set(dates)])
+    .filter((dates) => dates.length > 1);
+  if (normalized.length) write(sharedNotesKey(calendarId), JSON.stringify(normalized));
+  else remove(sharedNotesKey(calendarId));
+}
+
 /**
  * Persist a date-keyed snapshot after the calendar identity changes.
  * This makes edits survive changes to the project name, dates, or week mode.
@@ -123,12 +149,21 @@ export function saveSnapshot(calendarId, snapshot) {
   Object.entries(snapshot.colors ?? {}).forEach(([dateKey, color]) => {
     saveColor(calendarId, dateKey, color);
   });
+  saveSharedNoteGroups(calendarId, snapshot.sharedNotes ?? []);
 }
 
 /** Clear the visible dates from one calendar without touching other projects. */
 export function clearVisibleContent(calendarId, dateKeys, { notes = true, colors = true } = {}) {
+  const visibleDates = new Set(dateKeys);
   dateKeys.forEach((dateKey) => {
     if (notes) remove(noteKey(calendarId, dateKey));
     if (colors) remove(colorKey(calendarId, dateKey));
   });
+
+  if (notes) {
+    const remainingGroups = loadSharedNoteGroups(calendarId)
+      .map((dates) => dates.filter((date) => !visibleDates.has(date)))
+      .filter((dates) => dates.length > 1);
+    saveSharedNoteGroups(calendarId, remainingGroups);
+  }
 }

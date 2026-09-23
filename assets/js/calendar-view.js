@@ -20,9 +20,11 @@ import {
   clearVisibleContent,
   loadColor,
   loadNote,
+  loadSharedNoteGroups,
   removeColor,
   saveColor,
   saveNote,
+  saveSharedNoteGroups,
 } from "./storage.js";
 
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
@@ -37,6 +39,9 @@ export class CalendarView {
     this.selectionAnchor = null;
     this.selecting = false;
     this.selectionMoved = false;
+    this.selectionMode = null;
+    this.sharedNotesEditor = null;
+    this.sharedNoteGroups = [];
     this.calendarId = "";
     this.messages = null;
     this.language = "en";
@@ -53,13 +58,23 @@ export class CalendarView {
       if (!this.selecting) return;
       this.selecting = false;
 
-      if (this.selectionMoved) this.showColorMenu(event.clientX, event.clientY);
-      else this.clearSelection();
+      if (this.selectionMode === "notes" && this.selectionMoved) {
+        this.openSharedNotesEditor();
+      } else if (this.selectionMode === "color" && this.selectionMoved) {
+        this.showColorMenu(event.clientX, event.clientY);
+      } else {
+        this.clearSelection();
+      }
+
+      this.selectionMode = null;
     });
 
     // Close the previous menu before a day can start a fresh selection.
     document.addEventListener("pointerdown", (event) => {
-      if (!this.colorMenu.contains(event.target)) this.hideColorMenu();
+      if (!this.colorMenu.hidden && !this.colorMenu.contains(event.target)) this.hideColorMenu();
+      if (this.sharedNotesEditor && !this.sharedNotesEditor.contains(event.target)) {
+        this.closeSharedNotesEditor();
+      }
     }, { capture: true });
   }
 
@@ -72,8 +87,10 @@ export class CalendarView {
     this.calendarId = calendarId;
     this.messages = messages;
     this.language = language;
+    this.closeSharedNotesEditor({ render: false });
     this.clearSelection();
     this.calendar.replaceChildren();
+    this.sharedNoteGroups = loadSharedNoteGroups(calendarId);
 
     const first = startOfCalendarWeek(start, settings.weekStart);
     const periodDays = inclusiveDaysBetween(start, end);
@@ -88,6 +105,7 @@ export class CalendarView {
     this.updatePrintSizing(weeksCount);
     this.renderWeekdayHeader(start, settings.weekStart, messages, spansMultipleMonths);
     this.renderWeeks({ start, end, first, last, messages, spansMultipleMonths });
+    this.renderSharedNotesDisplays();
     this.updatePrintGroupSizing();
     return true;
   }
@@ -103,15 +121,15 @@ export class CalendarView {
     const colors = {};
 
     this.calendar.querySelectorAll(".notes").forEach((note) => {
-      const text = note.innerText.trim();
-      if (text) notes[note.closest(".day").dataset.date] = note.innerText;
+      const text = note.textContent.trim();
+      if (text) notes[note.closest(".day").dataset.date] = note.textContent;
     });
 
     this.calendar.querySelectorAll(".day.colored").forEach((cell) => {
       colors[cell.dataset.date] = cell.style.getPropertyValue("--custom-color");
     });
 
-    return { notes, colors };
+    return { notes, colors, sharedNotes: this.sharedNoteGroups.map((dates) => [...dates]) };
   }
 
   /** Return all currently rendered date keys, including padding days. */
@@ -121,9 +139,12 @@ export class CalendarView {
 
   /** Remove notes from visible cells and storage. */
   clearNotes() {
+    this.closeSharedNotesEditor({ render: false });
+    this.sharedNoteGroups = [];
     clearVisibleContent(this.calendarId, this.getVisibleDateKeys(), { notes: true, colors: false });
     this.calendar.querySelectorAll(".notes").forEach((note) => {
       note.textContent = "";
+      note.classList.remove("shared-note-member");
     });
     this.onContentChange();
   }
@@ -140,9 +161,12 @@ export class CalendarView {
 
   /** Remove all visible user-authored content. */
   clearAll() {
+    this.closeSharedNotesEditor({ render: false });
+    this.sharedNoteGroups = [];
     clearVisibleContent(this.calendarId, this.getVisibleDateKeys());
     this.calendar.querySelectorAll(".notes").forEach((note) => {
       note.textContent = "";
+      note.classList.remove("shared-note-member");
     });
     this.calendar.querySelectorAll(".day.colored").forEach((cell) => {
       cell.classList.remove("colored");
@@ -291,14 +315,18 @@ export class CalendarView {
     );
     note.textContent = loadNote(this.calendarId, dateKey);
     note.addEventListener("input", () => {
+      note.classList.remove("shared-note-member");
+      this.removeSharedNoteGroup(dateKey);
       saveNote(this.calendarId, dateKey, note.innerText);
       this.onStatusChange(messages.saving, messages.saved);
       this.onContentChange();
     });
+    note.addEventListener("pointerdown", (event) => this.beginNotesSelection(event));
+    note.addEventListener("pointerenter", () => this.extendSelection(cell, "notes"));
 
     cell.addEventListener("contextmenu", (event) => this.openContextMenu(event));
     cell.addEventListener("pointerdown", (event) => this.beginSelection(event));
-    cell.addEventListener("pointerenter", () => this.extendSelection(cell));
+    cell.addEventListener("pointerenter", () => this.extendSelection(cell, "color"));
     cell.append(header, note);
     return cell;
   }
@@ -315,26 +343,156 @@ export class CalendarView {
     if (event.button !== 0 || event.target.closest(".notes")) return;
     this.selecting = true;
     this.selectionMoved = false;
+    this.selectionMode = "color";
     this.selectionAnchor = event.currentTarget;
     this.clearSelection();
     this.addSelection(this.selectionAnchor);
     event.preventDefault();
   }
 
-  extendSelection(cell) {
-    if (!this.selecting || this.selectedCells.has(cell)) return;
+  beginNotesSelection(event) {
+    if (event.button !== 0) return;
+    this.selecting = true;
+    this.selectionMoved = false;
+    this.selectionMode = "notes";
+    this.selectionAnchor = event.currentTarget.closest(".day");
+    this.clearSelection();
+    this.addSelection(this.selectionAnchor, "notes");
+  }
+
+  extendSelection(cell, mode) {
+    if (!this.selecting || this.selectionMode !== mode || this.selectedCells.has(cell)) return;
     this.addSelection(cell);
     this.selectionMoved = true;
   }
 
-  addSelection(cell) {
+  addSelection(cell, mode = this.selectionMode) {
     this.selectedCells.add(cell);
     cell.classList.add("selected");
+    if (mode === "notes") cell.classList.add("notes-selected");
   }
 
   clearSelection() {
-    this.selectedCells.forEach((cell) => cell.classList.remove("selected"));
+    this.selectedCells.forEach((cell) => cell.classList.remove("selected", "notes-selected"));
     this.selectedCells.clear();
+  }
+
+  /** Turn the selected note areas into one centered editor and mirror its value to every day. */
+  openSharedNotesEditor(cells = [...this.selectedCells]) {
+    if (cells.length < 2) return;
+
+    const notes = cells.map((cell) => cell.querySelector(".notes"));
+    const values = notes.map((note) => note.textContent);
+    const commonValue = values.every((value) => value === values[0]) ? values[0] : "";
+    const calendarRect = this.calendar.getBoundingClientRect();
+    const rects = notes.map((note) => note.getBoundingClientRect());
+    const left = Math.min(...rects.map((rect) => rect.left));
+    const top = Math.min(...rects.map((rect) => rect.top));
+    const right = Math.max(...rects.map((rect) => rect.right));
+    const bottom = Math.max(...rects.map((rect) => rect.bottom));
+
+    const editor = document.createElement("div");
+    editor.className = "shared-notes-editor";
+    editor.contentEditable = "plaintext-only";
+    editor.spellcheck = true;
+    editor.dataset.placeholder = this.messages.activity;
+    editor.setAttribute("role", "textbox");
+    editor.setAttribute("aria-multiline", "true");
+    editor.setAttribute(
+      "aria-label",
+      `${this.messages.activitiesFor} ${cells.length} ${this.messages.daysPlural}`,
+    );
+    editor.textContent = commonValue;
+    editor.style.left = `${left - calendarRect.left}px`;
+    editor.style.top = `${top - calendarRect.top}px`;
+    editor.style.width = `${right - left}px`;
+    editor.style.height = `${bottom - top}px`;
+    editor.addEventListener("input", () => this.syncSharedNotes(editor, cells));
+    editor.dataset.dates = cells.map((cell) => cell.dataset.date).join(",");
+
+    this.sharedNotesEditor = editor;
+    this.calendar.append(editor);
+    window.getSelection()?.removeAllRanges();
+    editor.focus();
+  }
+
+  syncSharedNotes(editor, cells) {
+    const text = editor.innerText;
+    const dates = cells.map((cell) => cell.dataset.date);
+    const selectedDates = new Set(dates);
+    this.sharedNoteGroups = this.sharedNoteGroups.filter(
+      (group) => !group.some((date) => selectedDates.has(date)),
+    );
+    this.sharedNoteGroups.push(dates);
+    saveSharedNoteGroups(this.calendarId, this.sharedNoteGroups);
+    cells.forEach((cell) => {
+      const note = cell.querySelector(".notes");
+      note.textContent = text;
+      note.classList.add("shared-note-member");
+      saveNote(this.calendarId, cell.dataset.date, text);
+    });
+    this.onStatusChange(this.messages.saving, this.messages.saved);
+    this.onContentChange();
+  }
+
+  closeSharedNotesEditor({ render = true } = {}) {
+    if (!this.sharedNotesEditor) return;
+    this.sharedNotesEditor.remove();
+    this.sharedNotesEditor = null;
+    this.clearSelection();
+    if (render) this.renderSharedNotesDisplays();
+  }
+
+  removeSharedNoteGroup(dateKey) {
+    const nextGroups = this.sharedNoteGroups.filter((dates) => !dates.includes(dateKey));
+    if (nextGroups.length === this.sharedNoteGroups.length) return;
+    this.sharedNoteGroups = nextGroups;
+    saveSharedNoteGroups(this.calendarId, this.sharedNoteGroups);
+    this.renderSharedNotesDisplays();
+  }
+
+  /** Render every persisted multi-day note as one box spanning its member cells. */
+  renderSharedNotesDisplays() {
+    this.calendar.querySelectorAll(".shared-notes-display").forEach((display) => display.remove());
+    this.calendar.querySelectorAll(".notes.shared-note-member").forEach((note) => {
+      note.classList.remove("shared-note-member");
+    });
+
+    const calendarRect = this.calendar.getBoundingClientRect();
+    this.sharedNoteGroups.forEach((dates) => {
+      const cells = dates
+        .map((date) => this.calendar.querySelector(`.day[data-date="${date}"]`))
+        .filter(Boolean);
+      if (cells.length < 2) return;
+
+      const notes = cells.map((cell) => cell.querySelector(".notes"));
+      const rects = notes.map((note) => note.getBoundingClientRect());
+      notes.forEach((note) => note.classList.add("shared-note-member"));
+
+      const display = document.createElement("div");
+      display.className = "shared-notes-display";
+      display.textContent = notes[0].textContent;
+      display.setAttribute("role", "button");
+      display.tabIndex = 0;
+      display.setAttribute("aria-label", `${this.messages.activitiesFor} ${cells.length} ${this.messages.daysPlural}`);
+      display.style.left = `${Math.min(...rects.map((rect) => rect.left)) - calendarRect.left}px`;
+      display.style.top = `${Math.min(...rects.map((rect) => rect.top)) - calendarRect.top}px`;
+      display.style.width = `${Math.max(...rects.map((rect) => rect.right)) - Math.min(...rects.map((rect) => rect.left))}px`;
+      display.style.height = `${Math.max(...rects.map((rect) => rect.bottom)) - Math.min(...rects.map((rect) => rect.top))}px`;
+
+      const openEditor = () => {
+        this.clearSelection();
+        cells.forEach((cell) => this.addSelection(cell, "notes"));
+        this.openSharedNotesEditor(cells);
+      };
+      display.addEventListener("click", openEditor);
+      display.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        openEditor();
+      });
+      this.calendar.append(display);
+    });
   }
 
   showColorMenu(x, y) {

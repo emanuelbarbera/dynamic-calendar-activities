@@ -72,7 +72,7 @@ export const additionalTranslations = {
     calendarActions: "Actions du calendrier",
     calendarLegend: "Légende du calendrier",
     calendarRegion: "Calendrier généré",
-    hint: "Astuce : écrivez directement dans une journée. Faites un clic droit ou faites glisser les en-têtes pour ajouter une couleur.",
+    hint: "Astuce : écrivez dans une journée ou faites glisser les zones d’écriture pour partager une note centrée. Faites glisser les en-têtes pour ajouter une couleur.",
     activitiesFor: "Activités du",
   },
   de: {
@@ -138,7 +138,7 @@ export const additionalTranslations = {
     calendarActions: "Kalenderaktionen",
     calendarLegend: "Kalenderlegende",
     calendarRegion: "Erstellter Kalender",
-    hint: "Tipp: Schreiben Sie direkt in einen Tag. Klicken Sie mit der rechten Maustaste oder ziehen Sie über Tagesköpfe, um Farbe hinzuzufügen.",
+    hint: "Tipp: Schreiben Sie in einen Tag oder ziehen Sie über Schreibbereiche, um eine zentrierte Notiz zu teilen. Ziehen Sie über Tagesköpfe, um Farbe hinzuzufügen.",
     activitiesFor: "Aktivitäten für",
   },
   zh: {
@@ -204,7 +204,7 @@ export const additionalTranslations = {
     calendarActions: "日历操作",
     calendarLegend: "日历图例",
     calendarRegion: "生成的日历",
-    hint: "提示：直接在日期中输入内容。右键单击或拖动日期标题即可添加颜色。",
+    hint: "提示：在某一天中输入，或拖过多个书写区域以共享一条居中的备注。拖动日期标题可添加颜色。",
     activitiesFor: "活动日期",
   },
   ja: {
@@ -270,7 +270,7 @@ export const additionalTranslations = {
     calendarActions: "カレンダー操作",
     calendarLegend: "カレンダーの凡例",
     calendarRegion: "生成されたカレンダー",
-    hint: "ヒント：日付内に直接入力できます。色を追加するには、日付ヘッダーを右クリックするかドラッグします。",
+    hint: "ヒント：1日に入力するか、入力欄をドラッグして中央揃えのメモを共有できます。色を付けるには日付ヘッダーをドラッグします。",
     activitiesFor: "活動日",
   },
   ko: {
@@ -336,7 +336,7 @@ export const additionalTranslations = {
     calendarActions: "캘린더 작업",
     calendarLegend: "캘린더 범례",
     calendarRegion: "생성된 캘린더",
-    hint: "팁: 날짜 안에 직접 입력하세요. 색상을 추가하려면 날짜 머리글을 마우스 오른쪽 버튼으로 클릭하거나 드래그하세요.",
+    hint: "팁: 하루에 입력하거나 쓰기 영역을 드래그해 가운데 정렬된 메모를 공유하세요. 색상을 추가하려면 날짜 머리글을 드래그하세요.",
     activitiesFor: "활동 날짜",
   },
   ar: {
@@ -402,7 +402,7 @@ export const additionalTranslations = {
     calendarActions: "إجراءات التقويم",
     calendarLegend: "دليل التقويم",
     calendarRegion: "التقويم المُنشأ",
-    hint: "تلميح: اكتب مباشرة داخل اليوم. انقر بزر الماوس الأيمن أو اسحب عبر عناوين الأيام لإضافة لون.",
+    hint: "تلميح: اكتب داخل يوم أو اسحب عبر مناطق الكتابة لمشاركة ملاحظة في المنتصف. اسحب عبر عناوين الأيام لإضافة لون.",
     activitiesFor: "أنشطة يوم",
   },
   hi: {
@@ -468,7 +468,7 @@ export const additionalTranslations = {
     calendarActions: "कैलेंडर कार्रवाइयाँ",
     calendarLegend: "कैलेंडर संकेत",
     calendarRegion: "बनाया गया कैलेंडर",
-    hint: "सुझाव: किसी दिन के अंदर सीधे लिखें। रंग जोड़ने के लिए दिन के शीर्षक पर दायाँ-क्लिक करें या खींचें।",
+    hint: "सुझाव: किसी दिन में लिखें या बीच में एक साझा नोट बनाने के लिए लेखन क्षेत्रों पर खींचें। रंग जोड़ने के लिए दिन के शीर्षकों पर खींचें।",
     activitiesFor: "इसके लिए गतिविधियाँ",
   },
   ru: {
@@ -534,7 +534,7 @@ export const additionalTranslations = {
     calendarActions: "Действия календаря",
     calendarLegend: "Обозначения календаря",
     calendarRegion: "Созданный календарь",
-    hint: "Совет: пишите прямо внутри дня. Чтобы добавить цвет, щёлкните правой кнопкой мыши или проведите по заголовкам дней.",
+    hint: "Совет: пишите внутри дня или проведите по областям ввода, чтобы создать общую заметку по центру. Для цвета проведите по заголовкам дней.",
     activitiesFor: "Активности на",
   },
 };
