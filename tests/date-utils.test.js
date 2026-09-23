@@ -74,6 +74,13 @@ test("language metadata and translation catalogs stay synchronized", () => {
   assert.deepEqual(Object.keys(LANGUAGE_OPTIONS), SUPPORTED_LANGUAGES);
 });
 
+test("Portuguese uses neutral Brazilian-friendly interface wording", () => {
+  assert.equal(translations.pt.share, "Compartilhar link");
+  assert.equal(translations.pt.linkShared, "Link compartilhado");
+  assert.equal(translations.pt.period, "Intervalo de datas");
+  assert.doesNotMatch(JSON.stringify(translations.pt), /\bpartilhar\b|\bpartilhado\b|\bnum\b/i);
+});
+
 test("Arabic uses right-to-left layout without affecting other languages", () => {
   assert.equal(getTextDirection("ar"), "rtl");
   assert.equal(getTextDirection("en"), "ltr");
