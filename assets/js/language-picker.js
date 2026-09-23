@@ -4,23 +4,23 @@
  *
  * Accessible language menu with visual country flags.
  *
- * Language names remain visible when the optional flag-icons CDN stylesheet
- * is unavailable, so a network failure never blocks the control.
+ * Flags use one local SVG sprite, so the menu is immediately available and
+ * renders consistently on desktop without a third-party CDN.
  */
 
 /** Keep visual metadata beside the control instead of coupling it to i18n. */
 export const LANGUAGE_OPTIONS = Object.freeze({
-  en: { flag: "gb", name: "English" },
+  en: { flag: "en", name: "English" },
   es: { flag: "es", name: "Español" },
   it: { flag: "it", name: "Italiano" },
   pt: { flag: "pt", name: "Português" },
   fr: { flag: "fr", name: "Français" },
   de: { flag: "de", name: "Deutsch" },
-  zh: { flag: "cn", name: "简体中文" },
-  ja: { flag: "jp", name: "日本語" },
-  ko: { flag: "kr", name: "한국어" },
-  ar: { flag: "sa", name: "العربية" },
-  hi: { flag: "in", name: "हिन्दी" },
+  zh: { flag: "zh", name: "简体中文" },
+  ja: { flag: "ja", name: "日本語" },
+  ko: { flag: "ko", name: "한국어" },
+  ar: { flag: "ar", name: "العربية" },
+  hi: { flag: "hi", name: "हिन्दी" },
   ru: { flag: "ru", name: "Русский" },
 });
 
@@ -45,7 +45,7 @@ export class LanguagePicker {
     const option = LANGUAGE_OPTIONS[value];
 
     this.input.value = value;
-    this.flag.className = `fi fi-${option.flag}`;
+    this.flag.dataset.flag = option.flag;
     this.name.textContent = option.name;
     this.options.forEach((button) => {
       button.setAttribute("aria-checked", String(button.dataset.language === value));

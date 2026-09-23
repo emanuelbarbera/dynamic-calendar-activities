@@ -226,13 +226,41 @@ h1 {
   box-shadow: 0 0 0 3px rgb(15 118 110 / 14%);
 }
 
-.language-trigger .fi,
-.language-menu .fi {
+.language-flag {
   flex: none;
-  width: 20px;
+  width: 22px;
+  height: 16.5px;
   border-radius: 2px;
-  box-shadow: 0 0 0 1px rgb(15 23 42 / 12%);
+  background-image: url("../icons/language-flags.svg");
+  background-repeat: no-repeat;
+  background-size: 400% 300%;
+  box-shadow: 0 0 0 1px rgb(15 23 42 / 14%);
 }
+
+[data-language="en"] .language-flag,
+.language-flag[data-flag="en"] { background-position: 0 0; }
+[data-language="es"] .language-flag,
+.language-flag[data-flag="es"] { background-position: 33.333% 0; }
+[data-language="it"] .language-flag,
+.language-flag[data-flag="it"] { background-position: 66.667% 0; }
+[data-language="pt"] .language-flag,
+.language-flag[data-flag="pt"] { background-position: 100% 0; }
+[data-language="fr"] .language-flag,
+.language-flag[data-flag="fr"] { background-position: 0 50%; }
+[data-language="de"] .language-flag,
+.language-flag[data-flag="de"] { background-position: 33.333% 50%; }
+[data-language="zh"] .language-flag,
+.language-flag[data-flag="zh"] { background-position: 66.667% 50%; }
+[data-language="ja"] .language-flag,
+.language-flag[data-flag="ja"] { background-position: 100% 50%; }
+[data-language="ko"] .language-flag,
+.language-flag[data-flag="ko"] { background-position: 0 100%; }
+[data-language="ar"] .language-flag,
+.language-flag[data-flag="ar"] { background-position: 33.333% 100%; }
+[data-language="hi"] .language-flag,
+.language-flag[data-flag="hi"] { background-position: 66.667% 100%; }
+[data-language="ru"] .language-flag,
+.language-flag[data-flag="ru"] { background-position: 100% 100%; }
 
 .language-chevron {
   margin-left: auto;
@@ -901,6 +929,7 @@ html[dir="rtl"] .travel-arrow-wrap {
 
 .weekdays,
 .calendar-week {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
@@ -1098,10 +1127,17 @@ html[dir="rtl"] .travel-arrow-wrap {
 }
 
 .shared-notes-display {
-  border-color: var(--color-brand);
-  background: #ffffff;
+  top: calc(50% + 18px) !important;
+  height: auto !important;
+  max-height: calc(100% - 54px);
+  padding-block: 8px;
+  border-color: rgb(15 118 110 / 72%);
+  background: rgb(255 255 255 / 58%);
   box-shadow: none;
   cursor: text;
+  overflow-wrap: anywhere;
+  backdrop-filter: blur(1px);
+  transform: translateY(-50%);
 }
 
 .shared-notes-display:focus-visible {
@@ -1441,6 +1477,27 @@ html[dir="rtl"] .travel-arrow-wrap {
 
   .notes:empty::before {
     content: "";
+  }
+
+  .shared-notes-editor {
+    display: none;
+  }
+
+  .shared-notes-display {
+    top: calc(2.3mm + 10pt + 1.2mm) !important;
+    bottom: 2.3mm;
+    height: auto !important;
+    max-height: none;
+    padding: 1.5mm;
+    border-width: 0.4mm;
+    border-radius: 1.5mm;
+    overflow: hidden;
+    background: rgb(255 255 255 / 52%);
+    font-size: 7pt;
+    line-height: 1.18;
+    transform: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
   .day.weekend {

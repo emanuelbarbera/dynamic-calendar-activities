@@ -170,10 +170,12 @@ function applyLanguage(nextLanguage, { rerender = true } = {}) {
   languagePicker.setValue(language);
   saveLanguage(language);
   translateDocument(language);
-  dateRangePicker.update({ language, messages });
 
   if (rerender) refreshCalendar();
-  else setStatus(messages.ready);
+  else {
+    dateRangePicker.update({ language, messages });
+    setStatus(messages.ready);
+  }
 }
 
 /** Load URL state first, then local preferences, then safe defaults. */
@@ -257,6 +259,8 @@ function bindApplicationEvents() {
   });
   elements.share.addEventListener("click", shareCalendar);
   document.querySelector("#printButton").addEventListener("click", () => window.print());
+  window.addEventListener("beforeprint", () => calendarView.prepareForPrint());
+  window.addEventListener("afterprint", () => calendarView.scheduleSharedNotesLayout());
 
   document.querySelector("#clearButton").addEventListener("click", () => {
     if (!Object.keys(calendarView.getSnapshot().notes).length) return;

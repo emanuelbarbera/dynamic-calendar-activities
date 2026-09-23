@@ -45,6 +45,7 @@ export class CalendarView {
     this.calendarId = "";
     this.messages = null;
     this.language = "en";
+    this.layoutFrame = null;
 
     this.bindPersistentEvents();
   }
@@ -76,6 +77,8 @@ export class CalendarView {
         this.closeSharedNotesEditor();
       }
     }, { capture: true });
+
+    window.addEventListener("resize", () => this.scheduleSharedNotesLayout());
   }
 
   /** Render a complete calendar from immutable settings and translations. */
@@ -87,6 +90,7 @@ export class CalendarView {
     this.calendarId = calendarId;
     this.messages = messages;
     this.language = language;
+    this.fullDateFormatter = new Intl.DateTimeFormat(language, { dateStyle: "long" });
     this.closeSharedNotesEditor({ render: false });
     this.clearSelection();
     this.calendar.replaceChildren();
@@ -311,7 +315,7 @@ export class CalendarView {
     note.dataset.placeholder = outside ? messages.optional : messages.activity;
     note.setAttribute(
       "aria-label",
-      `${messages.activitiesFor} ${new Intl.DateTimeFormat(this.language, { dateStyle: "long" }).format(date)}`,
+      `${messages.activitiesFor} ${this.fullDateFormatter.format(date)}`,
     );
     note.textContent = loadNote(this.calendarId, dateKey);
     note.addEventListener("input", () => {
@@ -458,7 +462,6 @@ export class CalendarView {
       note.classList.remove("shared-note-member");
     });
 
-    const calendarRect = this.calendar.getBoundingClientRect();
     this.sharedNoteGroups.forEach((dates) => {
       const cells = dates
         .map((date) => this.calendar.querySelector(`.day[data-date="${date}"]`))
@@ -466,33 +469,69 @@ export class CalendarView {
       if (cells.length < 2) return;
 
       const notes = cells.map((cell) => cell.querySelector(".notes"));
-      const rects = notes.map((note) => note.getBoundingClientRect());
       notes.forEach((note) => note.classList.add("shared-note-member"));
-
-      const display = document.createElement("div");
-      display.className = "shared-notes-display";
-      display.textContent = notes[0].textContent;
-      display.setAttribute("role", "button");
-      display.tabIndex = 0;
-      display.setAttribute("aria-label", `${this.messages.activitiesFor} ${cells.length} ${this.messages.daysPlural}`);
-      display.style.left = `${Math.min(...rects.map((rect) => rect.left)) - calendarRect.left}px`;
-      display.style.top = `${Math.min(...rects.map((rect) => rect.top)) - calendarRect.top}px`;
-      display.style.width = `${Math.max(...rects.map((rect) => rect.right)) - Math.min(...rects.map((rect) => rect.left))}px`;
-      display.style.height = `${Math.max(...rects.map((rect) => rect.bottom)) - Math.min(...rects.map((rect) => rect.top))}px`;
 
       const openEditor = () => {
         this.clearSelection();
         cells.forEach((cell) => this.addSelection(cell, "notes"));
         this.openSharedNotesEditor(cells);
       };
-      display.addEventListener("click", openEditor);
-      display.addEventListener("keydown", (event) => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        openEditor();
+
+      // Anchor each fragment to its week. Percentage-based horizontal bounds
+      // survive responsive and print reflow, while splitting cross-week notes
+      // prevents one absolute rectangle from covering unrelated rows.
+      const cellsByWeek = new Map();
+      cells.forEach((cell) => {
+        const week = cell.closest(".calendar-week");
+        if (!cellsByWeek.has(week)) cellsByWeek.set(week, []);
+        cellsByWeek.get(week).push(cell);
       });
-      this.calendar.append(display);
+
+      cellsByWeek.forEach((weekCells, week) => {
+        const weekRect = week.getBoundingClientRect();
+        const weekNotes = weekCells.map((cell) => cell.querySelector(".notes"));
+        const rects = weekNotes.map((note) => note.getBoundingClientRect());
+        const left = Math.min(...rects.map((rect) => rect.left));
+        const top = Math.min(...rects.map((rect) => rect.top));
+        const right = Math.max(...rects.map((rect) => rect.right));
+        const bottom = Math.max(...rects.map((rect) => rect.bottom));
+
+        const display = document.createElement("div");
+        display.className = "shared-notes-display";
+        display.textContent = notes[0].textContent;
+        display.setAttribute("role", "button");
+        display.tabIndex = 0;
+        display.setAttribute("aria-label", `${this.messages.activitiesFor} ${cells.length} ${this.messages.daysPlural}`);
+        display.style.left = `${((left - weekRect.left) / weekRect.width) * 100}%`;
+        display.style.top = `${top - weekRect.top}px`;
+        display.style.width = `${((right - left) / weekRect.width) * 100}%`;
+        display.style.height = `${bottom - top}px`;
+        display.addEventListener("click", openEditor);
+        display.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          openEditor();
+        });
+        week.append(display);
+      });
     });
+  }
+
+  /** Recalculate absolute shared-note boxes after screen or print layout changes. */
+  scheduleSharedNotesLayout() {
+    window.cancelAnimationFrame(this.layoutFrame);
+    this.layoutFrame = window.requestAnimationFrame(() => {
+      this.layoutFrame = null;
+      this.renderSharedNotesDisplays();
+    });
+  }
+
+  /** Commit the active editor and synchronously measure the active print layout. */
+  prepareForPrint() {
+    this.closeSharedNotesEditor({ render: false });
+    // Force the browser to apply print styles before deriving box coordinates.
+    this.calendar.getBoundingClientRect();
+    this.renderSharedNotesDisplays();
   }
 
   showColorMenu(x, y) {

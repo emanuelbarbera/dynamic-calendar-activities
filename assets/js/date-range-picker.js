@@ -49,6 +49,13 @@ export class DateRangePicker {
   update({ language, messages }) {
     this.language = language;
     this.messages = messages;
+    this.formatters = {
+      short: new Intl.DateTimeFormat(language, { day: "numeric", month: "short", year: "numeric" }),
+      numeric: new Intl.DateTimeFormat(language),
+      weekday: new Intl.DateTimeFormat(language, { weekday: "long" }),
+      month: new Intl.DateTimeFormat(language, { month: "long", year: "numeric" }),
+      full: new Intl.DateTimeFormat(language, { dateStyle: "full" }),
+    };
     this.updateRangeDisplay();
     this.updateStageDisplay();
     if (!this.elements.popover.hidden) this.renderCalendars();
@@ -157,13 +164,7 @@ export class DateRangePicker {
 
     const dayCount = inclusiveDaysBetween(start, end);
     const duration = `${dayCount} ${dayCount === 1 ? this.messages.daySingular : this.messages.daysPlural}`;
-    const shortFormatter = new Intl.DateTimeFormat(this.language, {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-    const numericFormatter = new Intl.DateTimeFormat(this.language);
-    const weekdayFormatter = new Intl.DateTimeFormat(this.language, { weekday: "long" });
+    const { short: shortFormatter, numeric: numericFormatter, weekday: weekdayFormatter } = this.formatters;
 
     const startShort = shortFormatter.format(start);
     const endShort = shortFormatter.format(end);
@@ -206,10 +207,7 @@ export class DateRangePicker {
 
     const title = document.createElement("div");
     title.className = "popover-month-title";
-    title.textContent = new Intl.DateTimeFormat(this.language, {
-      month: "long",
-      year: "numeric",
-    }).format(monthDate);
+    title.textContent = this.formatters.month.format(monthDate);
 
     const weekdayRow = document.createElement("div");
     weekdayRow.className = "popover-weekdays";
@@ -244,7 +242,7 @@ export class DateRangePicker {
     button.className = "popover-day";
     button.textContent = String(date.getDate());
     button.dataset.date = key;
-    button.setAttribute("aria-label", new Intl.DateTimeFormat(this.language, { dateStyle: "full" }).format(date));
+    button.setAttribute("aria-label", this.formatters.full.format(date));
 
     if (key === toDateKey(new Date())) button.classList.add("is-today");
     if (key === this.draftStart) button.classList.add("is-start");

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="108" viewBox="0 0 192 108">
+  <defs>
+    <clipPath id="flag"><rect width="48" height="36" rx="2"/></clipPath>
+    <path id="star" d="M0-5 1.47-1.55 4.76-1.55 2.1.6 3.1 4-0 2-3.1 4-2.1.6-4.76-1.55-1.47-1.55Z"/>
+  </defs>
+
+  <g clip-path="url(#flag)">
+    <rect width="48" height="36" fill="#012169"/>
+    <path d="M0 0 48 36M48 0 0 36" stroke="#fff" stroke-width="8"/>
+    <path d="M0 0 48 36M48 0 0 36" stroke="#c8102e" stroke-width="3"/>
+    <path d="M24 0v36M0 18h48" stroke="#fff" stroke-width="12"/>
+    <path d="M24 0v36M0 18h48" stroke="#c8102e" stroke-width="7"/>
+  </g>
+
+  <g transform="translate(48)" clip-path="url(#flag)">
+    <rect width="48" height="36" fill="#aa151b"/><rect y="9" width="48" height="18" fill="#f1bf00"/>
+  </g>
+  <g transform="translate(96)" clip-path="url(#flag)">
+    <rect width="16" height="36" fill="#009246"/><rect x="16" width="16" height="36" fill="#fff"/><rect x="32" width="16" height="36" fill="#ce2b37"/>
+  </g>
+  <g transform="translate(144)" clip-path="url(#flag)">
+    <rect width="19" height="36" fill="#046a38"/><rect x="19" width="29" height="36" fill="#da291c"/><circle cx="19" cy="18" r="6" fill="#ffcc29"/><circle cx="19" cy="18" r="4" fill="#fff" stroke="#1b4d8c"/>
+  </g>
+
+  <g transform="translate(0 36)" clip-path="url(#flag)">
+    <rect width="16" height="36" fill="#0055a4"/><rect x="16" width="16" height="36" fill="#fff"/><rect x="32" width="16" height="36" fill="#ef4135"/>
+  </g>
+  <g transform="translate(48 36)" clip-path="url(#flag)">
+    <rect width="48" height="12" fill="#000"/><rect y="12" width="48" height="12" fill="#dd0000"/><rect y="24" width="48" height="12" fill="#ffce00"/>
+  </g>
+  <g transform="translate(96 36)" clip-path="url(#flag)">
+    <rect width="48" height="36" fill="#de2910"/><g transform="translate(11 10)" fill="#ffde00"><use href="#star"/></g><g transform="translate(21 5) scale(.38)" fill="#ffde00"><use href="#star"/></g><g transform="translate(25 10) scale(.38)" fill="#ffde00"><use href="#star"/></g><g transform="translate(25 17) scale(.38)" fill="#ffde00"><use href="#star"/></g><g transform="translate(20 22) scale(.38)" fill="#ffde00"><use href="#star"/></g>
+  </g>
+  <g transform="translate(144 36)" clip-path="url(#flag)">
+    <rect width="48" height="36" fill="#fff"/><circle cx="24" cy="18" r="10" fill="#bc002d"/>
+  </g>
+
+  <g transform="translate(0 72)" clip-path="url(#flag)">
+    <rect width="48" height="36" fill="#fff"/><path d="M24 9a9 9 0 0 1 0 18 4.5 4.5 0 0 0 0-9 4.5 4.5 0 0 1 0-9Z" fill="#cd2e3a"/><path d="M24 27a9 9 0 0 1 0-18 4.5 4.5 0 0 0 0 9 4.5 4.5 0 0 1 0 9Z" fill="#0047a0"/><g stroke="#000" stroke-width="1.4"><path d="M7 8h8M7 11h8M7 14h8M33 22h8M33 25h8M33 28h8"/></g>
+  </g>
+  <g transform="translate(48 72)" clip-path="url(#flag)">
+    <rect width="48" height="36" fill="#006c35"/><path d="M13 12h22M15 15h18M19 18h10" stroke="#fff" stroke-width="1.4"/><path d="M13 25h24l-4 2H17Z" fill="#fff"/>
+  </g>
+  <g transform="translate(96 72)" clip-path="url(#flag)">
+    <rect width="48" height="12" fill="#ff9933"/><rect y="12" width="48" height="12" fill="#fff"/><rect y="24" width="48" height="12" fill="#138808"/><circle cx="24" cy="18" r="4" fill="none" stroke="#000080" stroke-width="1.2"/><circle cx="24" cy="18" r="1" fill="#000080"/>
+  </g>
+  <g transform="translate(144 72)" clip-path="url(#flag)">
+    <rect width="48" height="12" fill="#fff"/><rect y="12" width="48" height="12" fill="#0039a6"/><rect y="24" width="48" height="12" fill="#d52b1e"/>
+  </g>
+</svg>

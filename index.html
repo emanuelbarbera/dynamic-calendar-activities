@@ -14,9 +14,6 @@
     <!-- JavaScript updates this lightweight rule when print orientation changes. -->
     <style id="printPageStyle">@page { size: A4 landscape; margin: 7mm; }</style>
     <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
-    <!-- Pinned flag-icons release; language names remain usable if it fails. -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="assets/css/main.css">
   </head>
   <body>
@@ -156,57 +153,57 @@
                   aria-controls="languageMenu"
                   aria-labelledby="languageLabel selectedLanguageName"
                 >
-                  <span class="fi fi-gb" id="selectedLanguageFlag" aria-hidden="true"></span>
+                  <span class="language-flag" id="selectedLanguageFlag" data-flag="en" aria-hidden="true"></span>
                   <span id="selectedLanguageName">English</span>
                   <span class="language-chevron" aria-hidden="true">⌄</span>
                 </button>
                 <div class="language-menu" id="languageMenu" role="menu" hidden>
                   <button type="button" role="menuitemradio" aria-checked="true" data-language="en">
-                    <span class="fi fi-gb" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>English</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="es">
-                    <span class="fi fi-es" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>Español</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="it">
-                    <span class="fi fi-it" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>Italiano</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="pt">
-                    <span class="fi fi-pt" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>Português</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="fr">
-                    <span class="fi fi-fr" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>Français</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="de">
-                    <span class="fi fi-de" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>Deutsch</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="zh">
-                    <span class="fi fi-cn" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>简体中文</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="ja">
-                    <span class="fi fi-jp" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>日本語</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="ko">
-                    <span class="fi fi-kr" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>한국어</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="ar">
-                    <span class="fi fi-sa" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>العربية</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="hi">
-                    <span class="fi fi-in" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>हिन्दी</span>
                   </button>
                   <button type="button" role="menuitemradio" aria-checked="false" data-language="ru">
-                    <span class="fi fi-ru" aria-hidden="true"></span>
+                    <span class="language-flag" aria-hidden="true"></span>
                     <span>Русский</span>
                   </button>
                 </div>
