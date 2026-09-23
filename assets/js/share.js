@@ -13,6 +13,7 @@ import { normalizeLanguage } from "./i18n.js";
 
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 const ALLOWED_WEEK_STARTS = new Set(["0", "1", "first"]);
+const ALLOWED_PRINT_ORIENTATIONS = new Set(["landscape", "portrait"]);
 
 /** Encode a JSON-compatible value as Unicode-safe Base64URL text. */
 export function encodeShareData(value) {
@@ -40,7 +41,7 @@ export function decodeShareData(value) {
 
 /** Limit untrusted URL content before it reaches the DOM or local storage. */
 function sanitizeShareData(value) {
-  if (!value || typeof value !== "object" || value.v !== 1) return null;
+  if (!value || typeof value !== "object" || ![1, 2].includes(value.v)) return null;
 
   const notes = {};
   const colors = {};
@@ -65,8 +66,8 @@ function sanitizeShareData(value) {
     if (normalized.length > 1) sharedNotes.push(normalized);
   });
 
-  return {
-    v: 1,
+  const snapshot = {
+    v: value.v,
     project: typeof (value.project ?? value.p) === "string"
       ? (value.project ?? value.p).slice(0, 80)
       : "",
@@ -74,47 +75,66 @@ function sanitizeShareData(value) {
     colors,
     sharedNotes,
   };
+
+  if (value.v === 1) return snapshot;
+
+  return {
+    ...snapshot,
+    start: isDateKey(value.start ?? value.s) ? (value.start ?? value.s) : null,
+    end: isDateKey(value.end ?? value.e) ? (value.end ?? value.e) : null,
+    weekStart: ALLOWED_WEEK_STARTS.has(value.weekStart ?? value.w)
+      ? (value.weekStart ?? value.w)
+      : null,
+    language: typeof (value.language ?? value.l) === "string"
+      ? normalizeLanguage(value.language ?? value.l)
+      : null,
+    printOrientation: ALLOWED_PRINT_ORIENTATIONS.has(value.printOrientation ?? value.o)
+      ? (value.printOrientation ?? value.o)
+      : null,
+  };
 }
 
 /** Read and validate calendar settings and content from the current URL. */
 export function readShareUrl() {
   const params = new URLSearchParams(window.location.search);
+  const data = decodeShareData(params.get("data"));
   const start = params.get("start_date");
   const end = params.get("end_date");
   const weekStart = params.get("week_start");
   const requestedLanguage = params.get("lang");
 
   return {
-    start: isDateKey(start) ? start : null,
-    end: isDateKey(end) ? end : null,
-    weekStart: ALLOWED_WEEK_STARTS.has(weekStart) ? weekStart : null,
-    language: requestedLanguage ? normalizeLanguage(requestedLanguage) : null,
-    project: (params.get("project") ?? "").slice(0, 80),
-    data: decodeShareData(params.get("data")),
+    start: data?.v === 2 ? data.start : (isDateKey(start) ? start : null),
+    end: data?.v === 2 ? data.end : (isDateKey(end) ? end : null),
+    weekStart: data?.v === 2
+      ? data.weekStart
+      : (ALLOWED_WEEK_STARTS.has(weekStart) ? weekStart : null),
+    language: data?.v === 2
+      ? data.language
+      : (requestedLanguage ? normalizeLanguage(requestedLanguage) : null),
+    printOrientation: data?.v === 2 ? data.printOrientation : null,
+    project: data?.project || (params.get("project") ?? "").slice(0, 80),
+    data,
   };
 }
 
-/** Replace the current URL with a shareable representation of visible state. */
-export function updateShareUrl({ settings, language, snapshot }) {
-  try {
-    const url = new URL(window.location.href);
-    url.search = "";
-    url.searchParams.set("start_date", settings.start);
-    url.searchParams.set("end_date", settings.end);
-    url.searchParams.set("lang", normalizeLanguage(language));
-    url.searchParams.set("week_start", settings.weekStart);
-    url.searchParams.set("data", encodeShareData({
-      v: 1,
-      project: settings.project,
-      notes: snapshot.notes,
-      colors: snapshot.colors,
-      sharedNotes: snapshot.sharedNotes,
-    }));
-    window.history.replaceState(null, "", url);
-  } catch {
-    // Some file:// environments restrict History API updates. The calendar
-    // remains fully usable even when its URL cannot be refreshed.
-  }
+/** Build a complete share URL without exposing it in the current address bar. */
+export function createShareUrl({ settings, language, snapshot }, baseUrl = window.location.href) {
+  const url = new URL(baseUrl);
+  url.search = "";
+  url.searchParams.set("data", encodeShareData({
+    v: 2,
+    p: settings.project,
+    s: settings.start,
+    e: settings.end,
+    w: settings.weekStart,
+    o: settings.printOrientation,
+    l: normalizeLanguage(language),
+    n: snapshot.notes,
+    c: snapshot.colors,
+    g: snapshot.sharedNotes,
+  }));
+  return url.toString();
 }
 
 /** Remove every query parameter while preserving the current path and hash. */

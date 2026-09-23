@@ -19,7 +19,7 @@ import {
   SUPPORTED_LANGUAGES,
   translateDocument,
 } from "./i18n.js";
-import { clearShareUrl, readShareUrl, updateShareUrl } from "./share.js";
+import { clearShareUrl, createShareUrl, readShareUrl } from "./share.js";
 import {
   clearVisibleContent,
   getCalendarId,
@@ -37,6 +37,7 @@ const elements = {
   end: document.querySelector("#endDate"),
   weekStart: document.querySelector("#weekStart"),
   printOrientation: document.querySelector("#printOrientation"),
+  share: document.querySelector("#shareButton"),
   language: document.querySelector("#language"),
   status: document.querySelector("#saveStatus"),
   calendar: document.querySelector("#calendar"),
@@ -46,8 +47,6 @@ const elements = {
 let language = "en";
 let messages = getMessages(language);
 let statusTimer = null;
-let shareTimer = null;
-let shareUpdatesEnabled = false;
 
 /** Read the current control values into the application's settings shape. */
 function getSettings() {
@@ -56,6 +55,7 @@ function getSettings() {
     start: elements.start.value,
     end: elements.end.value,
     weekStart: elements.weekStart.value,
+    printOrientation: elements.printOrientation.value,
   };
 }
 
@@ -79,7 +79,7 @@ function setStatus(current, settled = null) {
 const calendarView = new CalendarView({
   calendar: elements.calendar,
   colorMenu: elements.colorMenu,
-  onContentChange: scheduleShareUpdate,
+  onContentChange: () => {},
   onStatusChange: setStatus,
 });
 
@@ -116,26 +116,45 @@ function refreshCalendar({ carryVisibleContent = false } = {}) {
   saveSettings(settings);
   calendarView.render({ settings, calendarId, language, messages });
   dateRangePicker.update({ language, messages });
-  scheduleShareUpdate();
   setStatus(messages.saved);
 }
 
-/** Debounce URL work so typing a note does not rewrite history every keystroke. */
-function scheduleShareUpdate() {
-  // Initialization may restore URL or local state, but it must never create a
-  // query string until the user deliberately changes something.
-  if (!shareUpdatesEnabled) return;
-
-  window.clearTimeout(shareTimer);
-  shareTimer = window.setTimeout(() => {
-    const settings = getSettings();
-    if (!settings.start || !settings.end) return;
-    updateShareUrl({
-      settings,
+/** Share a self-contained snapshot without changing the URL in the address bar. */
+async function shareCalendar() {
+  try {
+    const url = createShareUrl({
+      settings: getSettings(),
       language,
       snapshot: calendarView.getSnapshot(),
     });
-  }, 180);
+    const title = getSettings().project || messages.defaultTitle;
+
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title, url });
+        setStatus(messages.linkShared);
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+      }
+    }
+
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(url);
+        setStatus(messages.linkCopied);
+        return;
+      } catch {
+        // Clipboard access can be denied even after a direct button click.
+        // The prompt below remains a usable manual-copy fallback.
+      }
+    }
+
+    window.prompt(messages.copyLink, url);
+    setStatus(messages.linkReady);
+  } catch {
+    setStatus(messages.shareFailed);
+  }
 }
 
 /** Apply a language consistently to static labels and dynamic calendar UI. */
@@ -154,6 +173,9 @@ function applyLanguage(nextLanguage, { rerender = true } = {}) {
 /** Load URL state first, then local preferences, then safe defaults. */
 function initialize() {
   const shared = readShareUrl();
+  // Consume incoming parameters immediately. Their validated values remain in
+  // memory and are persisted below, while the visible address stays clean.
+  if (window.location.search) clearShareUrl();
   const saved = loadSettings();
   const today = new Date();
   const browserLanguage = navigator.language?.split("-")[0];
@@ -161,11 +183,15 @@ function initialize() {
     ?? loadLanguage()
     ?? (SUPPORTED_LANGUAGES.includes(browserLanguage) ? browserLanguage : "en");
 
-  elements.project.value = shared.data?.project || shared.project || saved.project || "";
+  elements.project.value = shared.data ? shared.project : (shared.project || saved.project || "");
   elements.start.value = shared.start || saved.start || toDateKey(today);
   elements.end.value = shared.end || saved.end || toDateKey(addDays(today, 27));
   elements.weekStart.value = shared.weekStart
     || (["0", "1", "first"].includes(saved.weekStart) ? saved.weekStart : "1");
+  elements.printOrientation.value = shared.printOrientation
+    || (["landscape", "portrait"].includes(saved.printOrientation)
+      ? saved.printOrientation
+      : "landscape");
 
   // Repair stale or manually edited URLs whose end precedes their start.
   const validStart = parseDate(elements.start.value);
@@ -195,7 +221,6 @@ function initialize() {
   dateRangePicker.update({ language, messages });
   saveSettings(settings);
   saveLanguage(language);
-  shareUpdatesEnabled = true;
   setStatus(messages.ready);
 }
 
@@ -206,7 +231,6 @@ function bindApplicationEvents() {
   elements.project.addEventListener("input", () => {
     calendarView.updateProjectTitle(elements.project.value);
     saveSettings(getSettings());
-    scheduleShareUpdate();
   });
   elements.project.addEventListener("change", () => {
     refreshCalendar({ carryVisibleContent: true });
@@ -215,7 +239,11 @@ function bindApplicationEvents() {
   elements.weekStart.addEventListener("change", () => {
     refreshCalendar({ carryVisibleContent: true });
   });
-  elements.printOrientation.addEventListener("change", applyPrintOrientation);
+  elements.printOrientation.addEventListener("change", () => {
+    applyPrintOrientation();
+    saveSettings(getSettings());
+  });
+  elements.share.addEventListener("click", shareCalendar);
   document.querySelector("#printButton").addEventListener("click", () => window.print());
 
   document.querySelector("#clearButton").addEventListener("click", () => {
@@ -243,10 +271,7 @@ function bindApplicationEvents() {
     clearVisibleContent(getCalendarId(blankSettings), calendarView.getVisibleDateKeys());
     refreshCalendar();
 
-    // Clearing is intentionally different from normal edits: it removes all
-    // shared state from the address bar and cancels queued URL rewrites.
-    window.clearTimeout(shareTimer);
-    shareTimer = null;
+    // Also clean manually supplied or stale query parameters.
     clearShareUrl();
     setStatus(messages.allCleared);
   });

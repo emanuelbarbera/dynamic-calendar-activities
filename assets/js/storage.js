@@ -76,6 +76,7 @@ export function saveSettings(settings) {
     start: settings.start,
     end: settings.end,
     weekStart: settings.weekStart,
+    printOrientation: settings.printOrientation,
   }));
 }
 

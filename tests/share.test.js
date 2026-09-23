@@ -8,7 +8,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { clearShareUrl, decodeShareData, encodeShareData } from "../assets/js/share.js";
+import {
+  clearShareUrl,
+  createShareUrl,
+  decodeShareData,
+  encodeShareData,
+  readShareUrl,
+} from "../assets/js/share.js";
 
 test("clearShareUrl removes every query parameter and preserves the hash", () => {
   const previousWindow = globalThis.window;
@@ -44,6 +50,63 @@ test("shared note groups survive share URL encoding", () => {
 
   try {
     assert.deepEqual(decodeShareData(encodeShareData(payload)), payload);
+  } finally {
+    globalThis.window = previousWindow;
+  }
+});
+
+test("createShareUrl produces one self-contained parameter without changing location", () => {
+  const previousWindow = globalThis.window;
+  const originalHref = "https://example.test/calendar/?unrelated=old#view";
+  globalThis.window = {
+    location: { href: originalHref },
+    btoa: globalThis.btoa,
+    atob: globalThis.atob,
+  };
+
+  try {
+    const shareUrl = createShareUrl({
+      settings: {
+        project: "Release",
+        start: "2026-09-23",
+        end: "2026-09-24",
+        weekStart: "1",
+        printOrientation: "portrait",
+      },
+      language: "es",
+      snapshot: {
+        notes: { "2026-09-23": "Lanzamiento" },
+        colors: { "2026-09-23": "#dbeafe" },
+        sharedNotes: [],
+      },
+    });
+    const parsed = new URL(shareUrl);
+
+    assert.equal(globalThis.window.location.href, originalHref);
+    assert.deepEqual([...parsed.searchParams.keys()], ["data"]);
+    assert.equal(parsed.hash, "#view");
+
+    globalThis.window.location.search = parsed.search;
+    assert.deepEqual(readShareUrl(), {
+      start: "2026-09-23",
+      end: "2026-09-24",
+      weekStart: "1",
+      language: "es",
+      printOrientation: "portrait",
+      project: "Release",
+      data: {
+        v: 2,
+        project: "Release",
+        start: "2026-09-23",
+        end: "2026-09-24",
+        weekStart: "1",
+        language: "es",
+        printOrientation: "portrait",
+        notes: { "2026-09-23": "Lanzamiento" },
+        colors: { "2026-09-23": "#dbeafe" },
+        sharedNotes: [],
+      },
+    });
   } finally {
     globalThis.window = previousWindow;
   }

@@ -60,16 +60,16 @@ Changing the project name, date range, or week mode carries visible notes and co
 
 ## Data, privacy, and sharing
 
-The application has two client-side storage mechanisms:
+The application separates local persistence from link sharing:
 
-- `localStorage` keeps settings, daily notes, colors, and language preferences on the current device and browser profile.
-- The URL query string contains a Base64URL-encoded copy of the visible calendar so the view can be shared without a server.
+- `localStorage` is the source of truth for settings, daily notes, colors, language, and print preferences on the current device and browser profile.
+- The **Share link** button creates a self-contained URL with one Base64URL-encoded parameter, including the dates, project, language, print orientation, notes, colors, and shared-note layout.
 
-The initial page render never creates a query string. Share parameters are written only after a user changes the calendar. **Clear all** removes the visible content and every query parameter from the current URL. Existing share parameters are still read on arrival so shared links continue to work.
+Normal editing never creates or updates a query string. Opening a shared URL imports its validated snapshot into local storage and immediately removes the query string from the address bar. Legacy share URLs remain supported. **Clear all** removes the visible content and every query parameter from the current URL.
 
 Base64 is encoding, not encryption. Anyone who receives a shared URL can decode and read its notes. Do not put secrets, credentials, regulated data, or sensitive personal information in a shared calendar URL.
 
-There is no cloud synchronization. Clearing browser data removes locally saved calendars. A recipient who edits a shared calendar changes only their own browser copy and URL.
+There is no cloud synchronization. Clearing browser data removes locally saved calendars. A recipient who edits a shared calendar changes only their own browser copy. A new URL is created only when they use **Share link**.
 
 The only third-party runtime request is the pinned `flag-icons` stylesheet and its SVG flags from jsDelivr. It receives ordinary web-request metadata such as the visitor's IP address and user agent, but never receives calendar content from the application. Language names remain available if that request is blocked or offline.
 
@@ -111,7 +111,7 @@ Very large calendars or long notes create longer URLs. Browser and messaging-pla
 
 The project uses native browser ES modules. Each module has a narrow responsibility:
 
-- `app.js` is the composition root. It initializes state, wires controls, coordinates rendering, and updates the share URL.
+- `app.js` is the composition root. It initializes state, wires controls, coordinates rendering, and creates share links on demand.
 - `calendar-view.js` owns the generated calendar DOM and user interactions inside it.
 - `date-range-picker.js` owns draft date selection and commits validated ranges to the form.
 - `storage.js` is the only module that reads or writes browser storage.
@@ -126,18 +126,14 @@ This separation keeps the application easy to review without introducing a frame
 ### State flow
 
 ```text
-Controls or shared URL
-        ↓
-      app.js
-   ↙           ↘
-storage.js   date-range-picker.js
-   ↓             ↓
-calendar-view.js → visible calendar
-        ↓
-   share.js → current URL
+Shared URL → app.js → storage.js
+                ↓
+Controls → calendar-view.js → visible calendar
+                ↓
+        Share button → share.js → portable URL
 ```
 
-The DOM is the working view of daily notes and colors. Storage is the durable local copy. After a manual edit, the current URL becomes a debounced, portable snapshot of visible content; initialization alone leaves the address unchanged.
+The DOM is the working view of daily notes and colors, while local storage is the durable browser copy. Manual edits never change the address. `share.js` creates a portable snapshot only after the user presses the share button; received snapshots are imported and then removed from the visible address.
 
 ## Development
 
