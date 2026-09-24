@@ -11,6 +11,7 @@
 
 const SETTINGS_KEY = "dynamic-calendar:settings";
 const LANGUAGE_KEY = "dynamic-calendar:language";
+const THEME_KEY = "dynamic-calendar:theme";
 const CONTENT_PREFIX = "dynamic-calendar:v2";
 const memoryFallback = new Map();
 
@@ -88,6 +89,17 @@ export function loadLanguage() {
 /** Save the preferred interface language. */
 export function saveLanguage(language) {
   write(LANGUAGE_KEY, language);
+}
+
+/** Load an explicit color-theme preference, or null to follow the system. */
+export function loadTheme() {
+  const theme = read(THEME_KEY);
+  return theme === "light" || theme === "dark" ? theme : null;
+}
+
+/** Save the selected color theme. */
+export function saveTheme(theme) {
+  if (theme === "light" || theme === "dark") write(THEME_KEY, theme);
 }
 
 /** Load a daily note for a calendar. */

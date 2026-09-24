@@ -95,6 +95,10 @@ select {
   margin-bottom: 26px;
 }
 
+.masthead > div:first-child {
+  min-width: 0;
+}
+
 .eyebrow {
   margin: 0 0 7px;
   color: var(--color-brand);
@@ -111,10 +115,68 @@ h1 {
 }
 
 .intro {
+  max-width: 100%;
   margin: 8px 0 0;
   color: var(--color-muted);
   line-height: 1.5;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+}
+
+.masthead-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-toggle {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+  color: #475569;
+  background: rgb(255 255 255 / 72%);
+  box-shadow: 0 2px 8px rgb(15 23 42 / 7%);
+  transition: color 160ms, background 160ms, border-color 160ms, transform 160ms;
+}
+
+.theme-toggle:hover {
+  border-color: rgb(15 118 110 / 45%);
+  color: var(--color-brand);
+  background: var(--color-brand-soft);
+  transform: translateY(-1px);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid rgb(13 148 136 / 25%);
+  outline-offset: 2px;
+}
+
+.theme-icon {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 180ms, transform 180ms;
+}
+
+.theme-icon-moon,
+[data-theme="dark"] .theme-icon-sun {
+  opacity: 0;
+  transform: rotate(-25deg) scale(0.7);
+}
+
+[data-theme="dark"] .theme-icon-moon {
+  opacity: 1;
+  transform: rotate(0) scale(1);
 }
 
 .status {
@@ -132,6 +194,7 @@ h1 {
 }
 
 .status::before {
+  flex: none;
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -1241,6 +1304,179 @@ html[dir="rtl"] .travel-arrow-wrap {
 }
 
 /* ==========================================================================
+   Dark appearance
+   ========================================================================== */
+
+@media screen {
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ink: #e5edf3;
+  --color-muted: #98a9b9;
+  --color-line: #31414d;
+  --color-paper: #111c22;
+  --color-brand: #4fd1c5;
+  --color-brand-dark: #78e5db;
+  --color-brand-soft: #153a3a;
+  --color-weekend: #17242b;
+  --color-outside: #1c2931;
+  --color-danger: #fca5a5;
+  --shadow-panel: 0 18px 48px rgb(0 0 0 / 28%);
+}
+
+[data-theme="dark"] body {
+  background: linear-gradient(145deg, #0b1718 0%, #10171f 50%, #101b27 100%);
+}
+
+[data-theme="dark"] .controls,
+[data-theme="dark"] .calendar-wrapper {
+  border-color: rgb(148 163 184 / 14%);
+  background: rgb(17 28 34 / 94%);
+}
+
+[data-theme="dark"] .theme-toggle,
+[data-theme="dark"] .field > input:not([type="color"]),
+[data-theme="dark"] .field > select,
+[data-theme="dark"] .travel-trigger-btn,
+[data-theme="dark"] .language-trigger,
+[data-theme="dark"] .language-menu,
+[data-theme="dark"] .travel-popover,
+[data-theme="dark"] .popover-tab,
+[data-theme="dark"] .popover-nav-btn,
+[data-theme="dark"] .button.ghost,
+[data-theme="dark"] .button.danger,
+[data-theme="dark"] .day:not(.colored),
+[data-theme="dark"] .color-menu,
+[data-theme="dark"] .color-menu input[type="color"] {
+  border-color: #3a4a56;
+  color: var(--color-ink);
+  background: #16232a;
+}
+
+[data-theme="dark"] .field label,
+[data-theme="dark"] .travel-field-header,
+[data-theme="dark"] .preset-pill,
+[data-theme="dark"] .popover-nav-btn,
+[data-theme="dark"] .popover-month-title,
+[data-theme="dark"] .popover-day,
+[data-theme="dark"] .button.ghost,
+[data-theme="dark"] .month-indicator {
+  color: #c8d4dd;
+}
+
+[data-theme="dark"] .status,
+[data-theme="dark"] .travel-duration-badge {
+  color: #75e6b8;
+  background: #12342d;
+}
+
+[data-theme="dark"] .travel-trigger-btn.open,
+[data-theme="dark"] .action-group,
+[data-theme="dark"] .month-indicator {
+  background: #17272e;
+}
+
+[data-theme="dark"] .language-menu,
+[data-theme="dark"] .travel-popover,
+[data-theme="dark"] .color-menu {
+  box-shadow: 0 22px 50px rgb(0 0 0 / 40%);
+}
+
+[data-theme="dark"] .preset-pill {
+  border-color: #364752;
+  background: #1a2931;
+}
+
+[data-theme="dark"] .preset-pill:hover,
+[data-theme="dark"] .popover-day.in-range {
+  color: #9aeee6;
+  background: #17413f;
+}
+
+[data-theme="dark"] .popover-day:hover:not(.is-start):not(.is-end):not(.in-range),
+[data-theme="dark"] .icon-button:hover {
+  background: #22323a;
+}
+
+[data-theme="dark"] .popover-day.is-hover-range {
+  color: #bae6fd;
+  background: #17364a;
+}
+
+[data-theme="dark"] .popover-footer {
+  border-color: #31414d;
+}
+
+[data-theme="dark"] .action-group {
+  border-color: #334650;
+}
+
+[data-theme="dark"] .destructive-actions {
+  border-color: #623a42;
+  background: #2b2025;
+}
+
+[data-theme="dark"] .button.danger {
+  border-color: #6b3a43;
+}
+
+[data-theme="dark"] .button.danger:hover {
+  background: #3a2228;
+}
+
+[data-theme="dark"] .legend i {
+  background: #16232a;
+}
+
+[data-theme="dark"] .day.weekend:not(.colored) {
+  background: var(--color-weekend);
+}
+
+[data-theme="dark"] .day.outside:not(.colored) {
+  color: #718291;
+  background: var(--color-outside);
+}
+
+[data-theme="dark"] .day.colored {
+  color: #172033;
+  background: var(--custom-color);
+}
+
+[data-theme="dark"] .day.colored .day-month {
+  color: #64748b;
+}
+
+[data-theme="dark"] .day.colored .notes {
+  color: #26364d;
+}
+
+[data-theme="dark"] .weekday,
+[data-theme="dark"] .month-spacer {
+  color: #aebdc8;
+  background: #17242b;
+}
+
+[data-theme="dark"] .notes,
+[data-theme="dark"] .shared-notes-editor,
+[data-theme="dark"] .shared-notes-display {
+  color: #d9e4ea;
+}
+
+[data-theme="dark"] .notes:focus,
+[data-theme="dark"] .shared-notes-editor {
+  background: #302d20;
+}
+
+[data-theme="dark"] .shared-notes-display {
+  background: rgb(12 27 31 / 70%);
+}
+
+[data-theme="dark"] .notes:empty::before,
+[data-theme="dark"] .shared-notes-editor:empty::before {
+  color: #718291;
+}
+}
+
+/* ==========================================================================
    Responsive layout
    ========================================================================== */
 
@@ -1271,12 +1507,19 @@ html[dir="rtl"] .travel-arrow-wrap {
     display: block;
   }
 
-  .intro {
-    white-space: normal;
+  .masthead-actions {
+    width: 100%;
+    margin-top: 15px;
+    justify-content: flex-start;
   }
 
   .status {
-    margin-top: 15px;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: calc(100% - 44px);
+    margin-top: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .calendar-actions {

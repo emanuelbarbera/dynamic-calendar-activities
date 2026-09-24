@@ -25,9 +25,11 @@ import {
   getCalendarId,
   loadLanguage,
   loadSettings,
+  loadTheme,
   saveLanguage,
   saveSettings,
   saveSnapshot,
+  saveTheme,
 } from "./storage.js";
 
 const elements = {
@@ -40,6 +42,7 @@ const elements = {
   orientationButtons: [...document.querySelectorAll(".orientation-button")],
   share: document.querySelector("#shareButton"),
   language: document.querySelector("#language"),
+  themeToggle: document.querySelector("#themeToggle"),
   status: document.querySelector("#saveStatus"),
   calendar: document.querySelector("#calendar"),
   colorMenu: document.querySelector("#colorMenu"),
@@ -48,6 +51,24 @@ const elements = {
 let language = "en";
 let messages = getMessages(language);
 let statusTimer = null;
+
+/** Apply and announce the selected appearance without affecting calendar data. */
+function applyTheme(theme, { persist = false } = {}) {
+  const normalizedTheme = theme === "dark" ? "dark" : "light";
+  const dark = normalizedTheme === "dark";
+  document.documentElement.dataset.theme = normalizedTheme;
+  elements.themeToggle.setAttribute("aria-pressed", String(dark));
+
+  const label = dark ? messages.switchToLight : messages.switchToDark;
+  elements.themeToggle.setAttribute("aria-label", label);
+  elements.themeToggle.title = label;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute(
+    "content",
+    dark ? "#0b1718" : "#0f766e",
+  );
+
+  if (persist) saveTheme(normalizedTheme);
+}
 
 /** Read the current control values into the application's settings shape. */
 function getSettings() {
@@ -170,6 +191,7 @@ function applyLanguage(nextLanguage, { rerender = true } = {}) {
   languagePicker.setValue(language);
   saveLanguage(language);
   translateDocument(language);
+  applyTheme(document.documentElement.dataset.theme);
 
   if (rerender) refreshCalendar();
   else {
@@ -212,6 +234,9 @@ function initialize() {
   messages = getMessages(language);
   languagePicker.setValue(language);
   translateDocument(language);
+  const preferredTheme = loadTheme()
+    ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(preferredTheme);
   applyPrintOrientation();
 
   const settings = getSettings();
@@ -258,6 +283,10 @@ function bindApplicationEvents() {
     });
   });
   elements.share.addEventListener("click", shareCalendar);
+  elements.themeToggle.addEventListener("click", () => {
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(nextTheme, { persist: true });
+  });
   document.querySelector("#printButton").addEventListener("click", () => window.print());
   window.addEventListener("beforeprint", () => calendarView.prepareForPrint());
   window.addEventListener("afterprint", () => calendarView.scheduleSharedNotesLayout());

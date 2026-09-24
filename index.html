@@ -11,6 +11,24 @@
     <meta name="referrer" content="no-referrer">
     <meta name="theme-color" content="#0f766e">
     <title>Dynamic Calendar</title>
+    <script>
+      // Apply the saved theme before paint so returning visitors do not see a flash.
+      (() => {
+        try {
+          const savedTheme = localStorage.getItem("dynamic-calendar:theme");
+          const theme = savedTheme === "light" || savedTheme === "dark"
+            ? savedTheme
+            : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+          document.documentElement.dataset.theme = theme;
+          document.querySelector('meta[name="theme-color"]')?.setAttribute(
+            "content",
+            theme === "dark" ? "#0b1718" : "#0f766e",
+          );
+        } catch {
+          // The CSS light theme remains the safe fallback when storage is blocked.
+        }
+      })();
+    </script>
     <!-- JavaScript updates this lightweight rule when print orientation changes. -->
     <style id="printPageStyle">@page { size: A4 landscape; margin: 7mm; }</style>
     <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
@@ -28,7 +46,25 @@
               Organize activities, deliverables, and shifts for a specific period. Notes are saved automatically in this browser.
             </p>
           </div>
-          <span class="status" id="saveStatus" role="status" aria-live="polite">Ready</span>
+          <div class="masthead-actions">
+            <button
+              class="theme-toggle"
+              type="button"
+              id="themeToggle"
+              aria-pressed="false"
+              aria-label="Switch to dark mode"
+              title="Switch to dark mode"
+            >
+              <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="3.5"></circle>
+                <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+              </svg>
+              <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"></path>
+              </svg>
+            </button>
+            <span class="status" id="saveStatus" role="status" aria-live="polite">Ready</span>
+          </div>
         </header>
 
         <form id="calendarForm">
